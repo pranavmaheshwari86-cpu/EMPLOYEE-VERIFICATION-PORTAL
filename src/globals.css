@@ -1,0 +1,629 @@
+@import "tailwindcss";
+
+/* ============================================================
+   AETHERIS — Design System Foundation
+   AI-Powered Employee Verification Ecosystem
+   Cinematic Liquid Glass Design Language
+   ============================================================ */
+
+/* ============================================================
+   THEME: Tailwind v4 Custom Theme
+   ============================================================ */
+@theme {
+  /* ---- Color Primitives ---- */
+  --color-aetheris-black: #030712;
+  --color-aetheris-void: #0a0a0f;
+  --color-aetheris-deep: #0f1117;
+  --color-aetheris-surface: #141820;
+  --color-aetheris-elevated: #1a1f2e;
+  --color-aetheris-border: #1e2536;
+
+  /* ---- Stitch AI Custom Theme Colors ---- */
+  --color-surface-container-lowest: #080f10;
+  --color-on-tertiary: #67001e;
+  --color-on-primary-container: #006970;
+  --color-primary-fixed-dim: #00dbe9;
+  --color-on-error: #690005;
+  --color-surface-bright: #333b3b;
+  --color-outline-variant: #3b494b;
+  --color-surface: #0d1515;
+  --color-surface-variant: #2e3637;
+  --color-on-secondary-container: #b4b4bc;
+  --color-tertiary-fixed-dim: #ffb2b8;
+  --color-on-surface-variant: #b9cacb;
+  --color-inverse-primary: #006970;
+  --color-on-tertiary-fixed: #40000f;
+  --color-secondary: #c6c6ce;
+  --color-tertiary-fixed: #ffdadb;
+  --color-primary-fixed: #7df4ff;
+  --color-primary: #dbfcff;
+  --color-on-secondary: #2f3036;
+  --color-on-surface: #dce4e5;
+  --color-on-secondary-fixed-variant: #45464d;
+  --color-surface-dim: #0d1515;
+  --color-surface-container-highest: #2e3637;
+  --color-outline: #849495;
+  --color-secondary-container: #45464d;
+  --color-on-primary-fixed-variant: #004f54;
+  --color-tertiary-container: #ffcdd0;
+  --color-on-tertiary-fixed-variant: #91002d;
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-primary-container: #00f0ff;
+  --color-on-primary: #00363a;
+  --color-tertiary: #fff3f3;
+  --color-on-primary-fixed: #002022;
+  --color-surface-container-low: #151d1e;
+  --color-surface-tint: #00dbe9;
+  --color-secondary-fixed-dim: #c6c6ce;
+  --color-inverse-surface: #dce4e5;
+  --color-inverse-on-surface: #2a3233;
+  --color-background: #0d1515;
+  --color-surface-container: #192122;
+  --color-on-error-container: #ffdad6;
+  --color-on-background: #dce4e5;
+  --color-on-tertiary-container: #ba1340;
+  --color-secondary-fixed: #e2e2ea;
+  --color-surface-container-high: #232b2c;
+  --color-on-secondary-fixed: #1a1b21;
+  --color-glass-border: rgba(255, 255, 255, 0.45);
+
+  --color-aetheris-white: #f0f2f5;
+  --color-aetheris-muted: #8b95a5;
+  --color-aetheris-subtle: #4a5568;
+
+  --color-aetheris-cyan: #06b6d4;
+  --color-aetheris-cyan-glow: #22d3ee;
+  --color-aetheris-blue: #3b82f6;
+  --color-aetheris-blue-glow: #60a5fa;
+  --color-aetheris-violet: #8b5cf6;
+  --color-aetheris-violet-glow: #a78bfa;
+  --color-aetheris-emerald: #10b981;
+  --color-aetheris-amber: #f59e0b;
+  --color-aetheris-rose: #f43f5e;
+  
+  /* ---- Prisma Theme Colors ---- */
+  --color-prisma-primary: #DEDBC8;
+
+  /* ---- Typography Scale ---- */
+  --font-family-display: 'Instrument Serif', serif;
+  --font-family-heading: 'Instrument Serif', serif;
+  --font-family-body: 'Barlow', sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-family-almarai: 'Almarai', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  --font-family-serif: 'Instrument Serif', serif;
+
+  --font-size-hero: 5rem;
+  --font-size-display: 3.5rem;
+  --font-size-headline: 2.5rem;
+  --font-size-title: 1.75rem;
+  --font-size-subtitle: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-caption: 0.875rem;
+  --font-size-micro: 0.75rem;
+
+  /* ---- Spacing System ---- */
+  --spacing-section: 8rem;
+  --spacing-block: 4rem;
+  --spacing-element: 2rem;
+  --spacing-item: 1rem;
+  --spacing-tight: 0.5rem;
+
+  /* ---- Motion Timing ---- */
+  --ease-cinematic: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-cinematic: 800ms;
+  --duration-dramatic: 1200ms;
+
+  /* ---- Glass System ---- */
+  --glass-blur-sm: 8px;
+  --glass-blur-md: 16px;
+  --glass-blur-lg: 24px;
+  --glass-blur-xl: 40px;
+  --glass-blur-2xl: 64px;
+
+  /* ---- Depth / Shadows ---- */
+  --shadow-glow-sm: 0 0 15px -3px;
+  --shadow-glow-md: 0 0 25px -5px;
+  --shadow-glow-lg: 0 0 50px -12px;
+  --shadow-glow-xl: 0 0 80px -15px;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
+  --radius-full: 9999px;
+  --radius: 9999px;
+
+  /* ---- Z-Index Scale ---- */
+  --z-base: 1;
+  --z-elevated: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-navbar: 600;
+  --z-max: 9999;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: auto; /* Lenis handles smooth scroll */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-family-body);
+    background-color: var(--color-aetheris-black);
+    color: var(--color-aetheris-white);
+    overflow-x: clip;
+    max-width: 100vw;
+    min-height: 100vh;
+  }
+}
+
+/* Selection */
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+  color: var(--color-aetheris-white);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-aetheris-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 149, 165, 0.3);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 149, 165, 0.5);
+}
+
+/* ============================================================
+   GLASS SYSTEM — Liquid Glass Primitives
+   ============================================================ */
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(var(--glass-blur-lg));
+    -webkit-backdrop-filter: blur(var(--glass-blur-lg));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.04),
+      0 4px 24px -1px rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-sm {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(var(--glass-blur-sm));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .glass-md {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(var(--glass-blur-md));
+    -webkit-backdrop-filter: blur(var(--glass-blur-md));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+      0 8px 32px -4px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-lg {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(var(--glass-blur-xl));
+    -webkit-backdrop-filter: blur(var(--glass-blur-xl));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
+      0 16px 48px -8px rgba(0, 0, 0, 0.5);
+  }
+
+  .glass-highlight {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(255, 255, 255, 0.04) 100%
+    );
+    backdrop-filter: blur(var(--glass-blur-xl));
+    -webkit-backdrop-filter: blur(var(--glass-blur-xl));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 0 rgba(255, 255, 255, 0.02),
+      0 8px 32px -4px rgba(0, 0, 0, 0.3);
+  }
+
+  .liquid-glass {
+    background: rgba(255,255,255,0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: none;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-glass::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  .liquid-glass-strong {
+    background: rgba(255,255,255,0.01);
+    background-blend-mode: luminosity;
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(50px);
+    border: none;
+    box-shadow: 4px 4px 4px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .liquid-glass-strong::before {
+    content: "";
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    padding: 1.4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.2) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.2) 80%, rgba(255,255,255,0.5) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ============================================================
+   GLOW SYSTEM
+   ============================================================ */
+@layer utilities {
+  .glow-cyan {
+    box-shadow: var(--shadow-glow-md) rgba(6, 182, 212, 0.15),
+      0 0 60px -10px rgba(6, 182, 212, 0.1);
+  }
+
+  .glow-blue {
+    box-shadow: var(--shadow-glow-md) rgba(59, 130, 246, 0.15),
+      0 0 60px -10px rgba(59, 130, 246, 0.1);
+  }
+
+  .glow-violet {
+    box-shadow: var(--shadow-glow-md) rgba(139, 92, 246, 0.15),
+      0 0 60px -10px rgba(139, 92, 246, 0.1);
+  }
+
+  .glow-emerald {
+    box-shadow: var(--shadow-glow-md) rgba(16, 185, 129, 0.15),
+      0 0 60px -10px rgba(16, 185, 129, 0.1);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(6, 182, 212, 0.5),
+      0 0 40px rgba(6, 182, 212, 0.2);
+  }
+
+  .text-glow-blue {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
+      0 0 40px rgba(59, 130, 246, 0.2);
+  }
+
+  /* ============================================================
+     GRADIENT SYSTEM
+     ============================================================ */
+  .gradient-text-primary {
+    background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-secondary {
+    background: linear-gradient(135deg, #f0f2f5, #8b95a5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-warm {
+    background: linear-gradient(135deg, #f59e0b, #f43f5e, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-border {
+    position: relative;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.3));
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .mask-gradient {
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  }
+}
+
+/* ============================================================
+   ANIMATION KEYFRAMES
+   ============================================================ */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(1deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes data-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(6, 182, 212, 0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================================
+   ANIMATION UTILITIES
+   ============================================================ */
+@layer utilities {
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+  .animate-orbit { animation: orbit 20s linear infinite; }
+  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+  .animate-breathe { animation: breathe 4s ease-in-out infinite; }
+  .animate-marquee { animation: marquee 30s linear infinite; }
+  .animate-data-pulse { animation: data-pulse 2s ease-in-out infinite; }
+  .animate-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* Staggered animation delays */
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+  .delay-700 { animation-delay: 700ms; }
+  .delay-1000 { animation-delay: 1000ms; }
+
+  /* ============================================================
+     TYPOGRAPHY UTILITIES
+     ============================================================ */
+  .font-display {
+    font-family: var(--font-family-display);
+    letter-spacing: -0.02em;
+  }
+
+  .font-heading {
+    font-family: var(--font-family-heading);
+  }
+
+  .font-body {
+    font-family: var(--font-family-body);
+  }
+
+  .font-mono {
+    font-family: var(--font-family-mono);
+  }
+
+  .text-hero {
+    font-size: clamp(2.5rem, 6vw, var(--font-size-hero));
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+
+  .text-display {
+    font-size: clamp(2rem, 4.5vw, var(--font-size-display));
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+  }
+
+  .text-headline {
+    font-size: clamp(1.5rem, 3vw, var(--font-size-headline));
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* ============================================================
+     LAYOUT UTILITIES
+     ============================================================ */
+  .section-padding {
+    padding: var(--spacing-section) 0;
+  }
+}
+
+@layer components {
+  .container-aetheris {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-aetheris {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-aetheris {
+      padding: 0 3rem;
+    }
+  }
+}
+
+/* ============================================================
+   INTERACTIVE STATES
+   ============================================================ */
+@layer utilities {
+  .interactive {
+    transition: all var(--duration-normal) var(--ease-cinematic);
+    cursor: pointer;
+  }
+
+  .interactive:hover {
+    transform: translateY(-2px);
+  }
+
+  .interactive:active {
+    transform: translateY(0);
+  }
+
+  .magnetic-hover {
+    transition: transform var(--duration-fast) var(--ease-spring);
+  }
+}
+
+/* ============================================================
+   NOISE / GRAIN OVERLAY
+   ============================================================ */
+.noise-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: var(--z-max);
+}
+
+/* ============================================================
+   PRISMA NOISE UTILITIES
+   ============================================================ */
+.prisma-noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.prisma-bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}

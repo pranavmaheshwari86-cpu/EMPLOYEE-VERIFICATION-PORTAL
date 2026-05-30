@@ -1,0 +1,11 @@
+﻿node_modules/
+.next/
+dist/
+build/
+.env
+.env.local
+.env.production
+backend/node_modules/
+backend/dist/
+
+tsconfig.tsbuildinfo

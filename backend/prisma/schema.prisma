@@ -1,0 +1,471 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------------------------------
+// Enums
+// ----------------------------------------------------------------------------
+
+enum Role {
+  EMPLOYEE
+  RECRUITER
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  IN_PROGRESS
+  VERIFIED
+  REJECTED
+  FLAGGED
+}
+
+enum JobStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  AI_SCREENING
+  SHORTLISTED
+  INTERVIEW
+  OFFER
+  REJECTED
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  FREELANCE
+  INTERNSHIP
+}
+
+// ----------------------------------------------------------------------------
+// Models
+// ----------------------------------------------------------------------------
+
+model User {
+  id            String @id @default(auto()) @map("_id") @db.ObjectId
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(EMPLOYEE)
+  isActive      Boolean   @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  employeeProfile  Employee?
+  recruiterProfile Recruiter?
+  adminProfile     Admin?
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+  messagesSent     Message[]
+  activityLogs     ActivityLog[]
+  userSessions     UserSession[]
+  deviceSessions   DeviceSession[]
+  recommendations  RecommendationData[]
+  analyticsEvents  AnalyticsEvent[]
+
+  @@index([role])
+}
+
+model Employee {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String @db.ObjectId             @unique
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String             
+  lastName        String             
+  headline        String?            
+  bio             String?            
+  avatarUrl       String?
+  location        String?            
+  identityStatus  VerificationStatus @default(PENDING)
+  trustScore      Int                @default(0) // Range: 0-100
+  aiScore         Int                @default(0) // Range: 0-100
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  skills          EmployeeSkill[]
+  experiences     Experience[]
+  projects        Project[]
+  applications    Application[]
+  verifications   Verification[]
+  savedJobs       SavedJob[]
+  savedBy         SavedCandidate[]
+  resumeVersions  ResumeVersion[]
+  candidateScores CandidateScore[]
+
+  @@index([identityStatus])
+  @@index([trustScore])
+}
+
+model Recruiter {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String @db.ObjectId    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String    
+  lastName        String    
+  companyId       String @db.ObjectId
+  company         Company   @relation(fields: [companyId], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  jobs            Job[]
+  savedCandidates SavedCandidate[]
+
+  @@index([companyId])
+}
+
+model Admin {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String @db.ObjectId    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName       String    
+  lastName        String    
+  accessLevel     Int       @default(1)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model Company {
+  id                 String @id @default(auto()) @map("_id") @db.ObjectId
+  name               String             
+  slug               String             @unique
+  logoUrl            String?
+  website            String?
+  industry           String?            
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  recruiters      Recruiter[]
+  jobs            Job[]
+  verification    CompanyVerification?
+
+  @@index([verificationStatus])
+}
+
+model Job {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  companyId       String @db.ObjectId
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  recruiterId     String @db.ObjectId
+  recruiter       Recruiter @relation(fields: [recruiterId], references: [id])
+  title           String    
+  description     String    
+  location        String?   
+  type            JobType   @default(FULL_TIME)
+  salaryMin       Int?
+  salaryMax       Int?
+  currency        String?   
+  status          JobStatus @default(DRAFT)
+  aiRequirements  String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  applications    Application[]
+  requiredSkills  JobSkill[]
+  savedBy         SavedJob[]
+
+  @@index([companyId])
+  @@index([recruiterId])
+  @@index([status])
+  @@index([type])
+}
+
+model Skill {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  name            String    @unique 
+  category        String?   
+  createdAt       DateTime  @default(now())
+
+  employeeSkills  EmployeeSkill[]
+  jobSkills       JobSkill[]
+}
+
+model EmployeeSkill {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String @db.ObjectId
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  skillId         String @db.ObjectId
+  skill           Skill     @relation(fields: [skillId], references: [id])
+  yearsExp        Float?
+  verified        Boolean   @default(false)
+  aiConfidence    Int?
+  createdAt       DateTime  @default(now())
+
+  @@unique([employeeId, skillId])
+  @@index([employeeId])
+  @@index([skillId])
+}
+
+model JobSkill {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  jobId           String @db.ObjectId
+  job             Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  skillId         String @db.ObjectId
+  skill           Skill     @relation(fields: [skillId], references: [id])
+  isEssential     Boolean   @default(true)
+  minYearsExp     Float?
+
+  @@unique([jobId, skillId])
+  @@index([jobId])
+  @@index([skillId])
+}
+
+model Experience {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String @db.ObjectId
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company         String    
+  title           String    
+  startDate       DateTime
+  endDate         DateTime?
+  isCurrent       Boolean   @default(false)
+  description     String?   
+  verified        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([employeeId])
+}
+
+model Project {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String @db.ObjectId
+  employee        Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  title           String    
+  description     String    
+  repoUrl         String?
+  demoUrl         String?
+  aiAnalyzed      Boolean   @default(false)
+  aiCodeScore     Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([employeeId])
+}
+
+model Application {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  jobId           String @db.ObjectId
+  job             Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  employeeId      String @db.ObjectId
+  employee        Employee          @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  status          ApplicationStatus @default(APPLIED)
+  aiMatchScore    Int?
+  aiInsights      String?           
+  appliedAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([jobId, employeeId])
+  @@index([jobId])
+  @@index([employeeId])
+  @@index([status])
+}
+
+model Verification {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId      String @db.ObjectId
+  employee        Employee           @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  type            String             
+  status          VerificationStatus @default(PENDING)
+  provider        String?            
+  data            String?
+  verifiedAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@index([employeeId])
+  @@index([status])
+}
+
+model AuditLog {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String? @db.ObjectId
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action          String    
+  resourceType    String    
+  resourceId      String @db.ObjectId
+  details         String?
+  ipAddress       String?   
+  createdAt       DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   
+  title     String   
+  message   String   
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model Conversation {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  Message[]
+}
+
+model Message {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String @db.ObjectId
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String @db.ObjectId
+  sender         User         @relation(fields: [senderId], references: [id])
+  content        String       
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([senderId])
+}
+
+model SavedJob {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId String @db.ObjectId
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  jobId      String @db.ObjectId
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([employeeId, jobId])
+  @@index([employeeId])
+  @@index([jobId])
+}
+
+model SavedCandidate {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  recruiterId String @db.ObjectId
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  employeeId  String @db.ObjectId
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([recruiterId, employeeId])
+  @@index([recruiterId])
+  @@index([employeeId])
+}
+
+model ActivityLog {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ResumeVersion {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId String @db.ObjectId
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  fileUrl    String
+  parsedData String?
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId])
+}
+
+model CandidateScore {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  employeeId String @db.ObjectId
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  score      Int
+  category   String   
+  createdAt  DateTime @default(now())
+
+  @@index([employeeId])
+}
+
+model CompanyVerification {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  companyId    String @db.ObjectId   @unique
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  documentUrl  String
+  verified     Boolean  @default(false)
+  verifiedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model UserSession {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model DeviceSession {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String @db.ObjectId
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  device     String   
+  ipAddress  String?  
+  lastActive DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model SubscriptionPlan {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   
+  price       Float
+  features    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model RecommendationData {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  data      String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AnalyticsEvent {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  eventName String   
+  userId    String? @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  metadata  String?
+  createdAt DateTime @default(now())
+
+  @@index([eventName])
+  @@index([userId])
+  @@index([createdAt])
+}
