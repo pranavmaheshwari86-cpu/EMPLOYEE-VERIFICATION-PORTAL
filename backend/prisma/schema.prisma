@@ -58,8 +58,9 @@ enum JobType {
 
 model User {
   id            String @id @default(auto()) @map("_id") @db.ObjectId
+  supabaseId    String?   @unique
   email         String    @unique
-  passwordHash  String
+  passwordHash  String?
   role          Role      @default(EMPLOYEE)
   isActive      Boolean   @default(true)
   lastLogin     DateTime?
@@ -91,6 +92,16 @@ model Employee {
   bio             String?            
   avatarUrl       String?
   location        String?            
+  resumeUrl       String?
+  education       Json[]
+  certifications  String[]
+  portfolioLinks  String[]
+  socialLinks     String[]
+  yearsOfExperience Int?
+  techStack       String[]
+  languages       String[]
+  isFresher       Boolean            @default(false)
+  workExperiences Json[]
   identityStatus  VerificationStatus @default(PENDING)
   trustScore      Int                @default(0) // Range: 0-100
   aiScore         Int                @default(0) // Range: 0-100
@@ -117,10 +128,18 @@ model Recruiter {
   user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   firstName       String    
   lastName        String    
-  companyId       String @db.ObjectId
-  company         Company   @relation(fields: [companyId], references: [id])
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  companyId          String @db.ObjectId
+  company            Company   @relation(fields: [companyId], references: [id])
+  companyName        String?
+  companyLogo        String?
+  companyDescription String?
+  website            String?
+  industry           String?
+  socialLinks        String[]
+  hiringPreferences  Json?
+  contactDetails     Json?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   jobs            Job[]
   savedCandidates SavedCandidate[]

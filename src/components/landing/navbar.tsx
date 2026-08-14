@@ -51,12 +51,10 @@ export function Navbar() {
 
         <div className="container-aetheris h-full flex items-center justify-between relative z-10">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="relative flex items-center justify-center mr-1">
-              <Image src="/logo.png" alt="Aetheris Logo" width={32} height={32} className="object-contain rounded-md" />
-            </div>
-            <span className="text-xl font-display font-bold tracking-tight">
-              <span className="gradient-text-primary">AETHERIS</span>
+          <Link href="/" className="flex items-center gap-3 group">
+            <Image src="/logo.png" alt="Aetheris Logo" width={48} height={48} className="object-contain" />
+            <span className="text-xl tracking-[0.4em] text-white font-medium pl-1">
+              AETHERIS
             </span>
           </Link>
 
@@ -107,11 +105,9 @@ export function Navbar() {
             className="fixed inset-0 z-[60] bg-aetheris-black/95 backdrop-blur-3xl flex flex-col"
           >
             <div className="h-16 px-6 flex items-center justify-between border-b border-white/10">
-              <Link href="/" className="flex items-center gap-2" onClick={() => setIsMobileMenuOpen(false)}>
-                <div className="relative flex items-center justify-center mr-1">
-                  <Image src="/logo.png" alt="Aetheris Logo" width={32} height={32} className="object-contain rounded-md" />
-                </div>
-                <span className="text-xl font-display font-bold tracking-tight gradient-text-primary">
+              <Link href="/" className="flex items-center gap-3" onClick={() => setIsMobileMenuOpen(false)}>
+                <Image src="/logo.png" alt="Aetheris Logo" width={48} height={48} className="object-contain" />
+                <span className="text-xl tracking-[0.4em] text-white font-medium pl-1">
                   AETHERIS
                 </span>
               </Link>

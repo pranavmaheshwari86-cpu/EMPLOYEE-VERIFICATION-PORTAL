@@ -34,7 +34,7 @@ export function SpaceBackground() {
 
       {/* Animated Subtle Particles */}
       <div className="absolute inset-0 opacity-20">
-        <ParticleField particleCount={150} interactive={false} speed={0.1} color="mixed" connectionDistance={0} />
+        <ParticleField particleCount={40} interactive={false} speed={0.1} color="mixed" connectionDistance={0} />
       </div>
 
       {/* Giant Left Planet (Floating) */}

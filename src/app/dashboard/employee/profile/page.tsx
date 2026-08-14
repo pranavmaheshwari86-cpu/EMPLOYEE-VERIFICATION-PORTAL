@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { GlassCard } from "@/components/ui/glass-card";
 import { GlassInput } from "@/components/ui/glass-input";
 import { GlassButton } from "@/components/ui/glass-button";
@@ -69,14 +69,39 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const { fetchAPI } = await import('@/lib/api');
-        const res = await fetchAPI('/employee/profile');
-        if (res.status === 'success' && res.data?.profile) {
-          const names = res.data.profile.name.split(' ');
+        const profile = await fetchAPI('/employee/profile');
+        if (profile && !profile.error) {
+          const names = profile.firstName && profile.lastName 
+            ? [profile.firstName, profile.lastName] 
+            : (profile.name || '').split(' ');
+            
           setFormData(prev => ({
             ...prev,
             firstName: names[0] || prev.firstName,
             lastName: names.slice(1).join(' ') || prev.lastName,
-            title: res.data.profile.title || prev.title,
+            title: profile.headline || prev.title,
+            bio: profile.bio || prev.bio,
+            location: profile.location || prev.location,
+            website: profile.portfolioLinks?.[0] || prev.website,
+          }));
+
+          if (profile.workExperiences?.length) setExperience(profile.workExperiences);
+          if (profile.education?.length) setEducation(profile.education);
+          if (profile.certifications?.length) {
+            setCertifications(profile.certifications.map((c: string, i: number) => ({
+              id: i + 1, name: c, issuer: "Verified Issuer", date: "Present", verified: true, file: null
+            })));
+          }
+          if (profile.techStack?.length) {
+             setSkills(profile.techStack.map((s: string, i: number) => ({
+               id: i + 1, name: s, level: "Intermediate", score: 80, verified: true
+             })));
+          }
+          
+          setProfessionalLinks(prev => ({
+            ...prev,
+            linkedin: profile.socialLinks?.[0] || prev.linkedin,
+            github: profile.socialLinks?.[1] || prev.github,
           }));
         }
       } catch (error) {
@@ -87,26 +112,41 @@ export default function ProfilePage() {
     fetchProfile();
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
 
-  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProfessionalLinks({ ...professionalLinks, [e.target.name]: e.target.value });
-  };
+  const handleLinkChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setProfessionalLinks(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       const { fetchAPI } = await import('@/lib/api');
+      
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        headline: formData.title,
+        bio: formData.bio,
+        location: formData.location,
+        workExperiences: experience,
+        education: education,
+        certifications: certifications.map(c => c.name),
+        socialLinks: [professionalLinks.linkedin, professionalLinks.github].filter(Boolean),
+        portfolioLinks: [formData.website].filter(Boolean),
+        techStack: skills.map(s => s.name)
+      };
+
       await fetchAPI('/employee/profile', {
         method: 'PUT',
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       setIsEditing(false);
     } catch (error) {
       console.error('Failed to save profile:', error);
     }
-  };
+  }, [formData, experience, education, certifications, professionalLinks, skills]);
 
   if (!mounted) return null;
 

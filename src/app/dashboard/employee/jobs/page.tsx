@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Search, MapPin, DollarSign, Building, Star, Clock, Briefcase, Filter, X } from "lucide-react";
@@ -26,8 +26,13 @@ const COUNTRIES = [
 ];
 
 export default function JobsPage() {
-  const { appliedJobs, applyForJob, user } = useAppStore();
-  const [activeTab, setActiveTab] = useState("matches");
+  const { appliedJobs, applyForJob, user, jobs: storeJobs } = useAppStore();
+  const [mounted, setMounted] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   
@@ -88,7 +93,28 @@ export default function JobsPage() {
   };
 
   const filteredJobs = useMemo(() => {
-    let result = JOBS_DATA;
+    const formattedStoreJobs = storeJobs.map(j => ({
+      id: j.id,
+      title: j.jobTitle,
+      company: j.companyName || user?.companyName || "Aetheris Partner",
+      location: j.location || "Remote",
+      salary: j.salary || "Competitive",
+      type: j.workType || "Full-time",
+      match: 100,
+      posted: new Date(j.createdAt).toLocaleDateString(),
+      logo: (j.companyName || j.jobTitle || "C").charAt(0).toUpperCase(),
+      aiRecommended: true,
+      minExperience: parseInt(j.experience) || 0,
+      techStack: j.skills || [],
+      languages: user?.languages || ["English"],
+      aboutCompany: j.description || "",
+      companyDetails: { industry: "Technology", size: "10-50", founded: "2024" },
+      officialLinks: {},
+      requirements: [j.description || ""]
+    }));
+
+    // @ts-ignore
+    let result = [...formattedStoreJobs, ...JOBS_DATA];
 
     // Tab filtering
     if (activeTab === "saved") {
@@ -130,48 +156,50 @@ export default function JobsPage() {
       result = result.filter(j => 
         j.title.toLowerCase().includes(skillsQuery) || 
         // @ts-ignore
-        (j.skills && Array.isArray(j.skills) && j.skills.some(s => s.toLowerCase().includes(skillsQuery)))
+        (j.techStack && Array.isArray(j.techStack) && j.techStack.some(s => s.toLowerCase().includes(skillsQuery)))
       );
     }
 
-    // --- AUTOMATIC PROFILE MATCHING ---
-    if (user) {
+    // --- AUTOMATIC PROFILE MATCHING (Only applied on "matches" tab) ---
+    if (activeTab === "matches" && user && user.role === 'EMPLOYEE') {
       // 1. Experience matching
-      if (user.experience !== undefined) {
-        result = result.filter(j => j.minExperience <= (user.experience as number));
+      if (user.experience !== undefined && user.experience !== null && user.experience !== "") {
+        result = result.filter(j => j.minExperience <= Number(user.experience));
       }
 
-      // 2. Tech Stack matching (at least 2 overlap, if user has tech stack)
+      // 2. Tech Stack matching (if user has tech stack)
       if (user.techStack && user.techStack.length > 0) {
         const userStackLow = user.techStack.map(t => t.toLowerCase());
         result = result.filter(j => {
-          const jobStackLow = j.techStack.map(t => t.toLowerCase());
-          const overlap = jobStackLow.filter(t => userStackLow.includes(t)).length;
-          // If job only asks for 1 tech, let it pass if matched, otherwise require 2
-          return overlap >= Math.min(2, j.techStack.length);
+          if (!j.techStack || j.techStack.length === 0) return true;
+          const jobStackLow = j.techStack.map((t: string) => t.toLowerCase());
+          const overlap = jobStackLow.filter((t: string) => userStackLow.includes(t)).length;
+          return overlap >= 1;
         });
       }
 
-      // 3. Languages matching (at least 1 overlap, if user has languages)
+      // 3. Languages matching (if user has languages)
       if (user.languages && user.languages.length > 0) {
         const userLangsLow = user.languages.map(l => l.toLowerCase());
         result = result.filter(j => {
-          const jobLangsLow = j.languages.map(l => l.toLowerCase());
-          const overlap = jobLangsLow.filter(l => userLangsLow.includes(l)).length;
+          if (!j.languages || j.languages.length === 0) return true;
+          const jobLangsLow = j.languages.map((l: string) => l.toLowerCase());
+          const overlap = jobLangsLow.filter((l: string) => userLangsLow.includes(l)).length;
           return overlap >= 1;
         });
       }
     }
 
     return result;
-  }, [activeTab, searchQuery, filters, savedJobs, user]);
+  }, [activeTab, searchQuery, filters, savedJobs, user, storeJobs]);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 pl-2">
         <div>
-          <h1 className="text-4xl font-sans font-bold text-white mb-1">Job Opportunities</h1>
-          <p className="text-aetheris-muted text-base">Discover roles matched to your verified skills and experience.</p>
+          <h1 className="text-4xl text-white font-serif italic" style={{ fontFamily: "'Instrument Serif', serif" }}>
+            Job <span className="text-[#e8d5c4] not-italic">Opportunities</span>.
+          </h1>
         </div>
         <div className="w-full md:w-auto flex gap-2">
           <div className="relative flex-1 md:w-80">
@@ -254,6 +282,7 @@ export default function JobsPage() {
       {/* Tabs */}
       <div className="flex border-b border-white/10">
         {[
+          { id: "all", label: `All Opportunities (${storeJobs.length + JOBS_DATA.length})` },
           { id: "matches", label: "Top Matches" },
           { id: "saved", label: `Saved Roles (${savedJobs.length})` },
           { id: "applied", label: "Applications" }

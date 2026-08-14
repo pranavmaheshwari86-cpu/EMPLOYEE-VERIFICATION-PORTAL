@@ -34,13 +34,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="min-h-screen bg-aetheris-black text-aetheris-white flex overflow-hidden">
       {/* Sidebar */}
       <aside className="hidden md:flex w-64 border-r border-white/5 bg-white/[0.01] flex-col z-20">
-        <div className="h-16 flex items-center px-6 border-b border-white/5">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative flex items-center justify-center">
-              <Hexagon className="w-6 h-6 text-aetheris-rose" strokeWidth={1.5} />
-              <Zap className="w-3 h-3 text-aetheris-rose absolute" strokeWidth={2} />
-            </div>
-            <span className="text-lg font-display font-bold tracking-tight text-white">
+        <div className="h-24 flex items-center px-4 border-b border-white/5">
+          <Link href="/" className="flex items-center gap-3 -ml-1">
+            <img src="/logo.png" alt="Aetheris Logo" className="w-10 h-10 object-contain" />
+            <span className="text-lg tracking-[0.4em] text-white font-medium">
               AETHERIS
             </span>
           </Link>

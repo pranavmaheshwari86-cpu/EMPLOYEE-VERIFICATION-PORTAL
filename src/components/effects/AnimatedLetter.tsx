@@ -30,6 +30,18 @@ export function AnimatedLetter({ children, charProgress }: AnimatedLetterProps) 
   );
 }
 
+function AnimatedChar({ char, charProgress, scrollYProgress }: { char: string; charProgress: number; scrollYProgress: any }) {
+  const start = Math.max(0, charProgress - 0.1);
+  const end = Math.min(1, charProgress + 0.05);
+  const opacity = useTransform(scrollYProgress, [start, end], [0.2, 1]);
+
+  return (
+    <motion.span style={{ opacity }}>
+      {char}
+    </motion.span>
+  );
+}
+
 export function AnimatedParagraph({ text, className = "" }: { text: string; className?: string }) {
   const containerRef = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({
@@ -44,16 +56,8 @@ export function AnimatedParagraph({ text, className = "" }: { text: string; clas
     <p ref={containerRef} className={className}>
       {chars.map((char, index) => {
         const charProgress = index / totalChars;
-        const start = Math.max(0, charProgress - 0.1);
-        const end = Math.min(1, charProgress + 0.05);
-        
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const opacity = useTransform(scrollYProgress, [start, end], [0.2, 1]);
-
         return (
-          <motion.span key={index} style={{ opacity }}>
-            {char}
-          </motion.span>
+          <AnimatedChar key={index} char={char} charProgress={charProgress} scrollYProgress={scrollYProgress} />
         );
       })}
     </p>

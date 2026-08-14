@@ -80,12 +80,10 @@ export function Footer() {
             transition={{ duration: 0.6 }}
             className="max-w-md"
           >
-            <Link href="/" className="flex items-center gap-2.5 mb-4 group">
-              <div className="relative flex items-center justify-center mr-1">
-                <Image src="/logo.png" alt="Aetheris Logo" width={36} height={36} className="object-contain rounded-md" />
-              </div>
-              <span className="text-xl font-display font-bold tracking-tight">
-                <span className="gradient-text-primary">AETHERIS</span>
+            <Link href="/" className="flex items-center gap-3 mb-4 group">
+              <Image src="/logo.png" alt="Aetheris Logo" width={56} height={56} className="object-contain" />
+              <span className="text-xl tracking-[0.4em] text-white font-medium pl-1">
+                AETHERIS
               </span>
             </Link>
             <p className="text-aetheris-muted text-sm leading-relaxed mb-6">

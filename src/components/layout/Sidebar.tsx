@@ -34,15 +34,9 @@ export function Sidebar() {
     <aside aria-label="Sidebar Navigation" className="hidden md:block fixed inset-y-0 left-0 w-72 border-r border-white/5 bg-[#181818]/40 backdrop-blur-3xl z-40">
       <div className="flex flex-col h-full p-6">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2 mb-10 pt-4">
-          <svg className="w-10 h-10 text-[#d6cdb5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-            <path d="M12 2L2 22h20L12 2z" />
-            <path d="M12 2v20" />
-            <path d="M6 14h12" />
-            <path d="M9 8h6" />
-            <path d="M2 22L12 10L22 22" />
-          </svg>
-          <h1 className="text-xl tracking-[0.4em] text-white font-medium pl-2">AETHERIS</h1>
+        <div className="flex items-center gap-3 mb-10 pt-4 -ml-2">
+          <Image src="/logo.png" alt="Aetheris Logo" width={48} height={48} className="object-contain" />
+          <h1 className="text-xl tracking-[0.4em] text-white font-medium">AETHERIS</h1>
         </div>
 
         {/* Navigation */}
@@ -56,14 +50,14 @@ export function Sidebar() {
                 key={item.name}
                 href={item.href}
                 aria-label={item.name}
-                className={`flex items-center gap-4 px-6 py-4 rounded-xl transition-all group ${
+                className={`flex items-center gap-3 px-6 py-3 rounded-full transition-all group ${
                   isActive
                     ? "bg-[#e8d5c4]/10 text-[#e8d5c4] border border-[#e8d5c4]/20"
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 }`}
               >
-                <Icon className={`w-6 h-6 ${!isActive && "group-hover:text-[#d6cdb5] transition-colors"}`} />
-                <span className="font-medium text-lg">{item.name}</span>
+                <Icon className={`w-5 h-5 ${!isActive && "group-hover:text-[#d6cdb5] transition-colors"}`} />
+                <span className="font-medium text-sm">{item.name}</span>
                 {item.badge && (
                   <div className="ml-auto w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-mono text-gray-400 group-hover:bg-[#e8d5c4]/20 group-hover:text-[#e8d5c4] transition-colors">
                     {item.badge}
@@ -79,9 +73,9 @@ export function Sidebar() {
           <button 
             onClick={handleLogout}
             aria-label="Sign Out"
-            className="flex w-full items-center gap-4 px-6 py-4 rounded-xl text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-error)]/10 font-medium text-lg transition-colors"
+            className="flex w-full items-center gap-3 px-6 py-3 rounded-full text-[var(--color-on-surface-variant)] hover:text-[var(--color-error)] hover:bg-[var(--color-error)]/10 font-medium text-sm transition-colors"
           >
-            <LogOut className="w-6 h-6" />
+            <LogOut className="w-5 h-5" />
             <span className="font-medium">Sign Out</span>
           </button>
           <div 

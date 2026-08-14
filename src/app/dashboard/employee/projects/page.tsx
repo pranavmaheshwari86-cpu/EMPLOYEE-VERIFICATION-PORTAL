@@ -5,6 +5,8 @@ import { Plus, Video, Play, Code2, Globe, Code, X } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { GlassInput } from "@/components/ui/glass-input";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAppStore } from "@/lib/store";
+import { useEffect } from "react";
 
 interface Project {
   id: string;
@@ -16,28 +18,16 @@ interface Project {
   repoUrl?: string;
 }
 
-const DEFAULT_PROJECTS: Project[] = [
-  {
-    id: "proj-1",
-    name: "Aetherisis Authentication Service",
-    description: "A highly secure, zero-trust authentication microservice built for enterprise applications. Features biometric fallback and quantum-resistant encryption.",
-    techStack: ["Node.js", "TypeScript", "Redis", "PostgreSQL"],
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    demoUrl: "https://auth-demo.aetherisis.com",
-    repoUrl: "https://github.com/example/auth-service"
-  },
-  {
-    id: "proj-2",
-    name: "Nexus UI Component Library",
-    description: "An internal design system and React component library featuring glassmorphism and liquid-glass aesthetic styles.",
-    techStack: ["React", "Tailwind CSS", "Framer Motion"],
-    videoUrl: null,
-    demoUrl: "https://nexus-ui.dev",
-    repoUrl: "https://github.com/example/nexus-ui"
-  }
-];
+const DEFAULT_PROJECTS: Project[] = [];
 
 export default function ProjectsPage() {
+  const { user } = useAppStore();
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
   const [isAdding, setIsAdding] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "", techStack: "", videoUrl: "", demoUrl: "", repoUrl: "" });
@@ -63,10 +53,11 @@ export default function ProjectsPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 relative z-10 p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 pl-2">
         <div>
-          <h1 className="text-4xl font-heading italic font-medium text-[var(--color-on-surface)] mb-2">Projects Portfolio</h1>
-          <p className="text-[var(--color-on-surface-variant)]">Showcase your technical projects, open-source contributions, and demo videos.</p>
+          <h1 className="text-4xl text-white font-serif italic" style={{ fontFamily: "'Instrument Serif', serif" }}>
+            Projects <span className="text-[#e8d5c4] not-italic">Portfolio</span>.
+          </h1>
         </div>
         <GlassButton variant="primary" onClick={() => setIsAdding(true)} className="flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Project
@@ -193,7 +184,15 @@ export default function ProjectsPage() {
                     className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
                     muted
                     loop
-                    onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                    onMouseOver={(e) => {
+                      const v = e.target as HTMLVideoElement;
+                      const playPromise = v.play();
+                      if (playPromise !== undefined) {
+                        playPromise.catch(() => {
+                          // Ignore AbortError when play is interrupted by pause
+                        });
+                      }
+                    }}
                     onMouseOut={(e) => {
                       const v = e.target as HTMLVideoElement;
                       v.pause();

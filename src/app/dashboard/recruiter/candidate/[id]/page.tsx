@@ -138,17 +138,17 @@ export default function CandidateDetailsPage() {
 
 // --- Subcomponents for Tabs ---
 
-function ProfileTab({ candidate }: { candidate: Candidate }) {
-  const Section = ({ title, icon: Icon, children }: any) => (
-    <div className="border border-white/5 rounded-md bg-transparent p-6 flex flex-col mb-6">
-      <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
-        <Icon className="w-5 h-5 text-[#00E5FF]" />
-        <h2 className="text-[15px] font-medium text-white">{title}</h2>
-      </div>
-      <div>{children}</div>
+const Section = ({ title, icon: Icon, children }: any) => (
+  <div className="border border-white/5 rounded-md bg-transparent p-6 flex flex-col mb-6">
+    <div className="flex items-center gap-2 mb-6 border-b border-white/5 pb-4">
+      <Icon className="w-5 h-5 text-[#00E5FF]" />
+      <h2 className="text-[15px] font-medium text-white">{title}</h2>
     </div>
-  );
+    <div>{children}</div>
+  </div>
+);
 
+function ProfileTab({ candidate }: { candidate: Candidate }) {
   return (
     <div className="space-y-6">
       <Section title="Introduction" icon={User}>

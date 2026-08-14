@@ -1,24 +1,31 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { Send, Building2, MessageSquare, Search } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { JOBS_DATA } from "@/lib/jobs-data";
 
 export default function MessagesPage() {
-  const { appliedJobs, jobs } = useAppStore();
+  const { appliedJobs, jobs, user } = useAppStore();
+  const [mounted, setMounted] = useState(false);
   const [activeChat, setActiveChat] = useState<string | null>(null);
   
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   // Combine mock JOBS_DATA with store jobs
-  const allJobs = [...JOBS_DATA, ...jobs];
+  const allJobs = useMemo(() => [...JOBS_DATA, ...jobs], [jobs]);
   
   // Find unique companies the user has applied to
-  const appliedCompanies = appliedJobs.map(jobId => {
-    const job = allJobs.find(j => String(j.id) === String(jobId));
-    return job ? { id: job.id, name: (job as any).company || (job as any).companyName || "Unknown Company" } : null;
-  }).filter((c, index, self) => c !== null && self.findIndex(t => t?.name === c.name) === index);
+  const appliedCompanies = useMemo(() => {
+    return appliedJobs.map(jobId => {
+      const job = allJobs.find(j => String(j.id) === String(jobId));
+      return job ? { id: job.id, name: (job as any).company || (job as any).companyName || "Unknown Company" } : null;
+    }).filter((c, index, self) => c !== null && self.findIndex(t => t?.name === c.name) === index);
+  }, [appliedJobs, allJobs]);
 
-  const getWelcomeMessage = (companyName: string) => {
+  const getWelcomeMessage = useCallback((companyName: string) => {
     const job = allJobs.find(j => ((j as any).company || (j as any).companyName) === companyName && appliedJobs.includes(String(j.id)));
     if (job) {
       const j: any = job;
@@ -38,7 +45,7 @@ Here is a summary of the role requirements:
 How can our HR team assist you today?`;
     }
     return `Welcome to the chat with ${companyName}. How can our HR team assist you today?`;
-  };
+  }, [allJobs, appliedJobs]);
 
   const [messages, setMessages] = useState<Record<string, any[]>>({});
   const [inputValue, setInputValue] = useState("");
@@ -59,7 +66,7 @@ How can our HR team assist you today?`;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, activeChat]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !activeChat) return;
 
@@ -67,17 +74,17 @@ How can our HR team assist you today?`;
       { id: 'welcome', text: getWelcomeMessage(activeChat), sender: "company", time: timeNow }
     ];
 
-    setMessages({
-      ...messages,
+    setMessages(prev => ({
+      ...prev,
       [activeChat]: [...chatMsgs, {
         id: Date.now(),
         text: inputValue,
         sender: "me",
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]
-    });
+    }));
     setInputValue("");
-  };
+  }, [inputValue, activeChat, messages, getWelcomeMessage, timeNow]);
 
   const currentMessages = activeChat ? (messages[activeChat] || [
     { id: 'welcome', text: getWelcomeMessage(activeChat), sender: "company", time: timeNow }
@@ -85,9 +92,10 @@ How can our HR team assist you today?`;
 
   return (
     <div className="max-w-6xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
-      <div className="mb-6">
-        <h1 className="text-2xl font-display font-bold text-white mb-1">Messages</h1>
-        <p className="text-[var(--color-on-surface-variant)] text-sm">Direct encrypted channel with your company HR.</p>
+      <div className="mb-10 pl-2">
+        <h1 className="text-4xl text-white font-serif italic" style={{ fontFamily: "'Instrument Serif', serif" }}>
+          Direct <span className="text-[#e8d5c4] not-italic">Messages</span>.
+        </h1>
       </div>
 
       <div className="liquid-glass flex-1 flex min-h-0 overflow-hidden">
