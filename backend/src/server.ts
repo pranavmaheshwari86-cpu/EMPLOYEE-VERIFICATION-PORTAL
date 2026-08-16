@@ -108,7 +108,7 @@ app.use('/api/v1/upload', uploadRoutes);
 // Health check
 app.get('/', (_req, res) => res.redirect('/health'));
 app.get('/health', (_req, res) => {
-  res.status(200).json({ status: 'ok', service: 'aetherisis-api', timestamp: new Date().toISOString() });
+  res.status(200).json({ status: 'ok', service: 'aetheris-api', timestamp: new Date().toISOString() });
 });
 
 // 404 handler
@@ -136,5 +136,5 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 
 httpServer.listen(env.PORT, () => {
-  console.log(`AETHERISIS API running on port ${env.PORT} [${env.NODE_ENV}]`);
+  console.log(`AETHERIS API running on port ${env.PORT} [${env.NODE_ENV}]`);
 });

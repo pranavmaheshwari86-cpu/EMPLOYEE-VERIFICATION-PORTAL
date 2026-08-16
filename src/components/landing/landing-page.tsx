@@ -57,7 +57,7 @@ export function LandingPage() {
         
         {/* Navigation */}
         <nav className="fixed top-0 w-full bg-[#131313]/40 text-white font-body backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 md:px-10 py-4 z-50 transition-all duration-300">
-          <div className="font-heading text-4xl tracking-tighter text-white">Aetherisis</div>
+          <div className="font-heading text-4xl tracking-tighter text-white">Aetheris</div>
           <div className="hidden md:flex items-center gap-10">
             <a className="text-white border-b border-white pb-1 transition-colors duration-300" href="#experience">How it Works</a>
             <a className="text-[#c4c7c8] hover:text-white hover:backdrop-blur-2xl hover:bg-white/5 transition-all duration-300 rounded px-2 py-1" href="#visions">Employers</a>
@@ -268,8 +268,8 @@ export function LandingPage() {
 
         {/* Footer Shared Component */}
         <footer className="w-full bg-transparent text-[#c6c6ce] font-body text-sm border-t border-white/5 flex flex-col md:flex-row justify-between items-center px-6 py-10 max-w-[1440px] mx-auto opacity-80 hover:opacity-100 transition-opacity">
-          <div className="font-heading text-5xl md:text-[72px] text-white mb-4 md:mb-0">Aetherisis</div>
-          <div className="mb-4 md:mb-0 text-[#c4c7c8]">© 2026 Aetherisis Verification System. All rights reserved.</div>
+          <div className="font-heading text-5xl md:text-[72px] text-white mb-4 md:mb-0">Aetheris</div>
+          <div className="mb-4 md:mb-0 text-[#c4c7c8]">© 2026 Aetheris Verification System. All rights reserved.</div>
           <div className="flex gap-6">
             <a className="text-[#ba1340] hover:text-white transition-colors" href="/privacy">Privacy</a>
             <a className="text-[#ba1340] hover:text-white transition-colors" href="/terms">Terms</a>
