@@ -133,12 +133,12 @@
   --duration-cinematic: 800ms;
   --duration-dramatic: 1200ms;
 
-  /* ---- Glass System ---- */
-  --glass-blur-sm: 8px;
-  --glass-blur-md: 16px;
-  --glass-blur-lg: 24px;
-  --glass-blur-xl: 40px;
-  --glass-blur-2xl: 64px;
+  /* ---- Glass System (GPU-Optimized) ---- */
+  --glass-blur-sm: 4px;
+  --glass-blur-md: 8px;
+  --glass-blur-lg: 12px;
+  --glass-blur-xl: 16px;
+  --glass-blur-2xl: 20px;
 
   /* ---- Depth / Shadows ---- */
   --shadow-glow-sm: 0 0 15px -3px;
@@ -198,7 +198,8 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-heading);
-    letter-spacing: -0.025em;
+    letter-spacing: normal;
+    word-spacing: normal;
     line-height: 1.15;
     text-wrap: balance;
     color: #ffffff;
@@ -312,10 +313,10 @@
     pointer-events: none;
   }
   .liquid-glass-strong {
-    background: rgba(255,255,255,0.01);
+    background: rgba(255,255,255,0.02);
     background-blend-mode: luminosity;
-    backdrop-filter: blur(50px);
-    -webkit-backdrop-filter: blur(50px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: none;
     box-shadow: 4px 4px 4px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.15);
     position: relative;
@@ -635,24 +636,18 @@
    NOISE / GRAIN OVERLAY
    ============================================================ */
 .noise-overlay::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: var(--z-max);
+  display: none;
 }
 
 /* ============================================================
-   PRISMA NOISE UTILITIES
+   PRISMA NOISE UTILITIES (GPU Optimized)
    ============================================================ */
 .prisma-noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background: transparent;
 }
 
 .prisma-bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background: transparent;
 }
 
 /* ============================================================

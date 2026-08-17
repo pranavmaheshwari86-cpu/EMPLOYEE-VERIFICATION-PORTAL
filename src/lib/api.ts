@@ -9,14 +9,25 @@ export const fetchAPI = async (endpoint: string, options: RequestInit = {}) => {
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
 
-  if (!response.ok) {
-    throw new Error(await response.text());
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+      signal: options.signal || controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+
+    return await response.json();
+  } catch (err: any) {
+    clearTimeout(timeoutId);
+    throw err;
   }
-
-  return response.json();
 };

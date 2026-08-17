@@ -12,9 +12,9 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
     let animationFrameId: number;
 
     const lenis = new Lenis({
-      duration: 0.8,
+      duration: 0.35,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      touchMultiplier: 1.5,
+      touchMultiplier: 2,
       infinite: false,
     });
 

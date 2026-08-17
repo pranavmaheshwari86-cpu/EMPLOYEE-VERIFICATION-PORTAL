@@ -3,8 +3,8 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
-RUN npm ci --only=production && cp -R node_modules prod_modules
-RUN npm ci
+RUN npm ci --omit=dev --legacy-peer-deps && cp -R node_modules prod_modules
+RUN npm ci --legacy-peer-deps
 
 # Stage 2: Build
 FROM node:20-alpine AS build

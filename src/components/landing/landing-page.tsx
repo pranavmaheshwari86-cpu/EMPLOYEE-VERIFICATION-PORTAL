@@ -21,27 +21,24 @@ export function LandingPage() {
   const [activeSection, setActiveSection] = useState("experience");
 
   useEffect(() => {
-    const sections = [
-      { id: "experience", nav: "experience" },
-      { id: "visions", nav: "visions" },
-      { id: "fleet", nav: "fleet" },
-      { id: "journal", nav: "journal" }
-    ];
+    const sectionIds = ["experience", "visions", "fleet", "journal"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -60% 0px" }
+    );
 
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 250;
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i].id);
-        if (el && el.offsetTop <= scrollPosition) {
-          setActiveSection(sections[i].nav);
-          break;
-        }
-      }
-    };
+    sectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => observer.disconnect();
   }, []);
 
   const navItems = [

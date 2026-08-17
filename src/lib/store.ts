@@ -30,6 +30,7 @@ export interface User {
   socialLinks?: string[];
   experience?: number;
   techStack?: string[];
+  keySkills?: string[];
   languages?: string[];
   workExperience?: WorkExperience[];
   introduction?: string;
@@ -154,17 +155,27 @@ export const useAppStore = create<AppState>()(
             localStorage.setItem('token', authData.session.access_token);
           }
           
+          const loginEmail = authData.user!.email!;
+          let cachedProfile: Partial<User> = {};
+          try {
+            const raw = localStorage.getItem(`aetheris-user-profile-${loginEmail}`);
+            if (raw) cachedProfile = JSON.parse(raw);
+          } catch (e) {}
+
+          const mergedUser: User = {
+            id: authData.user!.id,
+            email: loginEmail,
+            firstName: authData.user!.user_metadata?.firstName || firstName || cachedProfile.firstName || 'User',
+            lastName: authData.user!.user_metadata?.lastName || lastName || cachedProfile.lastName || '',
+            role: authData.user!.user_metadata?.role || role || cachedProfile.role || 'EMPLOYEE',
+            hasProfile: !!(cachedProfile.introduction || cachedProfile.techStack?.length || cachedProfile.hasProfile),
+            ...cachedProfile,
+          };
+
           set({
-            user: {
-              id: authData.user!.id,
-              email: authData.user!.email!,
-              firstName: authData.user!.user_metadata?.firstName || firstName || 'User',
-              lastName: authData.user!.user_metadata?.lastName || lastName || '',
-              role: authData.user!.user_metadata?.role || role || 'EMPLOYEE',
-              hasProfile: false,
-            },
+            user: mergedUser,
             isAuthenticated: true,
-            hasProfile: false,
+            hasProfile: mergedUser.hasProfile || false,
             isLoading: false,
           });
 
@@ -292,77 +303,93 @@ export const useAppStore = create<AppState>()(
       fetchProfile: async () => {
         const { user } = get();
         if (!user) return;
+
+        let cachedProfile: Partial<User> = {};
+        try {
+          const raw = localStorage.getItem(`aetheris-user-profile-${user.email}`);
+          if (raw) cachedProfile = JSON.parse(raw);
+        } catch (e) {}
+
         try {
           const endpoint = user.role === 'EMPLOYEE' ? '/employee/profile' : '/recruiter/profile';
           const profile = await fetchAPI(endpoint);
           
           if (!profile || profile.error || profile.profileExists === false) {
+            const hasData = !!(user.introduction || user.techStack?.length || cachedProfile.introduction || cachedProfile.techStack?.length);
             set((state) => ({
-              hasProfile: false,
+              hasProfile: hasData,
               user: state.user ? {
+                ...cachedProfile,
                 ...state.user,
-                hasProfile: false,
-                introduction: '',
-                experience: 0,
-                techStack: [],
-                languages: [],
-                isFresher: true,
-                workExperience: [],
-                verifications: [],
+                hasProfile: hasData,
               } : null
             }));
             return;
           }
 
           if (user.role === 'EMPLOYEE') {
+            const updatedUser: User = {
+              ...user,
+              ...cachedProfile,
+              hasProfile: true,
+              firstName: profile.firstName || user.firstName,
+              lastName: profile.lastName || user.lastName,
+              introduction: profile.bio || user.introduction || cachedProfile.introduction || '',
+              experience: profile.yearsOfExperience ?? user.experience ?? cachedProfile.experience ?? 0,
+              techStack: (profile.techStack && profile.techStack.length > 0) ? profile.techStack : (user.techStack || cachedProfile.techStack || []),
+              keySkills: profile.keySkills || user.keySkills || cachedProfile.keySkills || [],
+              languages: (profile.languages && profile.languages.length > 0) ? profile.languages : (user.languages || cachedProfile.languages || []),
+              isFresher: profile.isFresher ?? user.isFresher ?? cachedProfile.isFresher ?? true,
+              workExperience: (profile.workExperiences && profile.workExperiences.length > 0) ? profile.workExperiences : (user.workExperience || cachedProfile.workExperience || []),
+              linkedin: profile.socialLinks?.[0] || user.linkedin || cachedProfile.linkedin || '',
+              github: profile.socialLinks?.[1] || user.github || cachedProfile.github || '',
+              portfolio: profile.portfolioLinks?.[0] || user.portfolio || cachedProfile.portfolio || '',
+              verifications: profile.verifications || user.verifications || cachedProfile.verifications || [],
+            };
+
             set({
               hasProfile: true,
-              user: {
-                ...user,
-                hasProfile: true,
-                firstName: profile.firstName || user.firstName,
-                lastName: profile.lastName || user.lastName,
-                introduction: profile.bio || '',
-                experience: profile.yearsOfExperience || 0,
-                techStack: profile.techStack || [],
-                languages: profile.languages || [],
-                isFresher: profile.isFresher ?? true,
-                workExperience: profile.workExperiences || [],
-                linkedin: profile.socialLinks?.[0] || '',
-                github: profile.socialLinks?.[1] || '',
-                portfolio: profile.portfolioLinks?.[0] || '',
-                verifications: profile.verifications || [],
-              }
+              user: updatedUser,
             });
+
+            if (user.email) {
+              try {
+                localStorage.setItem(`aetheris-user-profile-${user.email}`, JSON.stringify(updatedUser));
+              } catch (e) {}
+            }
           } else {
+            const updatedUser: User = {
+              ...user,
+              ...cachedProfile,
+              hasProfile: true,
+              companyName: profile.company?.name || profile.companyName || user.companyName || cachedProfile.companyName || '',
+              website: profile.company?.website || profile.website || user.website || cachedProfile.website || '',
+              industryType: profile.company?.industry || profile.industry || user.industryType || cachedProfile.industryType || '',
+              companyDescription: profile.companyDescription || user.companyDescription || cachedProfile.companyDescription || '',
+              contactDetails: profile.contactDetails || user.contactDetails || cachedProfile.contactDetails || null,
+              socialLinks: profile.socialLinks || user.socialLinks || cachedProfile.socialLinks || [],
+            };
+
             set({
               hasProfile: true,
-              user: {
-                ...user,
-                hasProfile: true,
-                companyName: profile.company?.name || profile.companyName || '',
-                website: profile.company?.website || profile.website || '',
-                industryType: profile.company?.industry || profile.industry || '',
-                companyDescription: profile.companyDescription || '',
-                contactDetails: profile.contactDetails || null,
-                socialLinks: profile.socialLinks || [],
-              }
+              user: updatedUser,
             });
+
+            if (user.email) {
+              try {
+                localStorage.setItem(`aetheris-user-profile-${user.email}`, JSON.stringify(updatedUser));
+              } catch (e) {}
+            }
           }
         } catch (error) {
-          console.warn("No profile found or backend error:", error);
+          console.warn("No profile found or backend error (preserving local profile data):", error);
+          const hasData = !!(user.introduction || user.techStack?.length || cachedProfile.introduction || cachedProfile.techStack?.length);
           set((state) => ({
-            hasProfile: false,
+            hasProfile: hasData,
             user: state.user ? {
+              ...cachedProfile,
               ...state.user,
-              hasProfile: false,
-              introduction: '',
-              experience: 0,
-              techStack: [],
-              languages: [],
-              isFresher: true,
-              workExperience: [],
-              verifications: [],
+              hasProfile: hasData,
             } : null
           }));
         }
@@ -412,9 +439,18 @@ export const useAppStore = create<AppState>()(
         const { user } = get();
         if (!user) return;
         
-        set((state) => ({
-          user: state.user ? { ...state.user, ...updates } : null
-        }));
+        const updatedUser = { ...user, ...updates, hasProfile: true };
+
+        set({
+          user: updatedUser,
+          hasProfile: true,
+        });
+
+        if (updatedUser.email) {
+          try {
+            localStorage.setItem(`aetheris-user-profile-${updatedUser.email}`, JSON.stringify(updatedUser));
+          } catch (e) {}
+        }
 
         try {
           const endpoint = user.role === 'EMPLOYEE' ? '/employee/profile' : '/recruiter/profile';

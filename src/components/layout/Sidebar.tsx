@@ -36,7 +36,7 @@ export function Sidebar() {
   ];
 
   return (
-    <aside aria-label="Sidebar Navigation" className="hidden md:block fixed inset-y-0 left-0 w-72 border-r border-white/5 bg-[#181818]/40 backdrop-blur-3xl z-40">
+    <aside aria-label="Sidebar Navigation" className="hidden md:block fixed inset-y-0 left-0 w-72 border-r border-white/5 bg-[#181818]/60 backdrop-blur-md z-40">
       <div className="flex flex-col h-full p-6">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-10 pt-4 -ml-2">

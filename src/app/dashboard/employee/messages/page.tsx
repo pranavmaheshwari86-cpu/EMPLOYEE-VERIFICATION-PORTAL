@@ -102,7 +102,7 @@ How can our HR team assist you today?`;
         {/* Sidebar */}
         <div className="w-1/3 border-r border-[var(--color-glass-border)]/20 flex flex-col bg-[var(--color-surface-variant)]/10">
           <div className="p-4 border-b border-[var(--color-glass-border)]/20">
-            <h3 className="text-sm font-medium text-white mb-3">Applied Companies</h3>
+            <h3 className="text-2xl text-white font-serif italic mb-3" style={{ fontFamily: "'Instrument Serif', serif" }}>Applied Companies</h3>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-aetheris-muted" />
               <input 

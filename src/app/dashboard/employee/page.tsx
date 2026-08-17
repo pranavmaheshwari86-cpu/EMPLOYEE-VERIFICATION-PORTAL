@@ -15,13 +15,31 @@ const SectionCard = ({ title, icon: Icon, children, onSave, saveText, headerActi
 
   const handleSaveClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    if (status === "saving") return;
     setStatus("saving");
+
+    let isDone = false;
+    const fallbackTimer = setTimeout(() => {
+      if (!isDone) {
+        setStatus("idle");
+      }
+    }, 3500);
+
     try {
-      await onSave();
-      setStatus("saved");
-      setHasSavedOnce(true);
-      setTimeout(() => setStatus("idle"), 2000);
+      const res = await onSave();
+      isDone = true;
+      clearTimeout(fallbackTimer);
+
+      if (res === false) {
+        setStatus("idle");
+      } else {
+        setStatus("saved");
+        setHasSavedOnce(true);
+        setTimeout(() => setStatus("idle"), 2000);
+      }
     } catch (error) {
+      isDone = true;
+      clearTimeout(fallbackTimer);
       setStatus("idle");
     }
   };
@@ -40,7 +58,7 @@ const SectionCard = ({ title, icon: Icon, children, onSave, saveText, headerActi
       </div>
       {onSave && (
         <div className="flex justify-end mt-8 border-t border-white/5 pt-6 gap-3">
-          {hasSavedOnce && (
+          {hasSavedOnce && status !== "saving" && (
             <button
               disabled
               className="flex items-center justify-center gap-2 py-2.5 px-6 rounded-full border border-green-500/30 bg-green-500/10 text-green-400 font-medium text-sm shadow-[0_0_20px_rgba(34,197,94,0.1)] cursor-default"
@@ -78,13 +96,14 @@ const IntroductionSection = ({ user, updateUser }: any) => {
     const introduction = introRef.current;
     if (!introduction.trim()) {
       alert("Introduction is compulsory!");
-      return;
+      return false;
     }
     try {
       await updateUser({ introduction });
-      // success
+      return true;
     } catch (e) {
       alert("Failed to save introduction. Please try again.");
+      return false;
     }
   };
 
@@ -106,7 +125,7 @@ const ProfessionalProfileSection = ({ user, updateUser }: any) => {
   const [isFresher, setIsFresher] = useState(user?.isFresher || false);
   const expRef = useRef(user?.experience?.toString() || "");
   const techRef = useRef(user?.techStack?.join(", ") || "");
-  const skillsRef = useRef("");
+  const skillsRef = useRef(user?.keySkills?.join(", ") || user?.techStack?.join(", ") || "");
   const langRef = useRef(user?.languages?.join(", ") || "");
 
   const handleSave = async () => {
@@ -117,22 +136,24 @@ const ProfessionalProfileSection = ({ user, updateUser }: any) => {
 
     if (!techStack.trim() || !keySkills.trim() || !languages.trim()) {
       alert("Tech Stack, Key Skills, and Languages are compulsory!");
-      return;
+      return false;
     }
     if (!isFresher && !experience.trim()) {
       alert("Years of Experience is compulsory for non-freshers!");
-      return;
+      return false;
     }
     try {
       await updateUser({
         isFresher,
         experience: isFresher ? 0 : parseInt(experience) || undefined,
         techStack: techStack.split(",").map((s: string) => s.trim()).filter(Boolean),
+        keySkills: keySkills.split(",").map((s: string) => s.trim()).filter(Boolean),
         languages: languages.split(",").map((s: string) => s.trim()).filter(Boolean)
       });
-      // success
+      return true;
     } catch (e) {
       alert("Failed to save profile. Please try again.");
+      return false;
     }
   };
 
@@ -178,7 +199,7 @@ const ProfessionalProfileSection = ({ user, updateUser }: any) => {
         <InputField
           label="Key Skills"
           placeholder="e.g. System Design, Agile"
-          defaultValue={""}
+          defaultValue={user?.keySkills?.join(", ") || user?.techStack?.join(", ") || ""}
           onChange={(e: any) => { skillsRef.current = e.target.value; }}
         />
         <InputField
@@ -214,7 +235,7 @@ const WorkExperienceSection = ({ user, updateUser }: any) => {
   const handleSave = async () => {
     if (items.length === 0) {
       alert("Work Experience is compulsory for non-freshers!");
-      return;
+      return false;
     }
     
     const finalData = items.map(item => ({
@@ -226,14 +247,15 @@ const WorkExperienceSection = ({ user, updateUser }: any) => {
     for (const exp of finalData) {
       if (!exp.company.trim() || !exp.role.trim() || !exp.duration.trim()) {
         alert("All fields in Work Experience are compulsory!");
-        return;
+        return false;
       }
     }
     try {
       await updateUser({ workExperience: finalData });
-      // success
+      return true;
     } catch (e) {
       alert("Failed to save experience. Please try again.");
+      return false;
     }
   };
 
@@ -323,9 +345,10 @@ const ProfessionalURLsSection = ({ user, updateUser }: any) => {
   const handleSave = async () => {
     try {
       await updateUser({ linkedin: inRef.current, github: ghRef.current, portfolio: ptRef.current });
-      // success
+      return true;
     } catch (e) {
       alert("Failed to save URLs. Please try again.");
+      return false;
     }
   };
 

@@ -72,7 +72,9 @@ export default function ProjectsPage() {
           >
             <form onSubmit={handleAddProject} className="liquid-glass-strong p-6 rounded-[24px] border border-aetheris-cyan/30 mb-8 space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-medium text-white">Add New Project</h2>
+                <h2 className="text-3xl text-white font-serif italic" style={{ fontFamily: "'Instrument Serif', serif" }}>
+                  Add New Project
+                </h2>
                 <button type="button" onClick={() => setIsAdding(false)} className="p-2 text-aetheris-muted hover:text-white transition-colors">
                   <X className="w-5 h-5" />
                 </button>
