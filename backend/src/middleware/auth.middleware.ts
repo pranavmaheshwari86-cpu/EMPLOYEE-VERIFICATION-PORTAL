@@ -20,7 +20,9 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABAS
 
 if (!supabaseUrl || !supabaseKey) {
   console.warn(
-    `[auth.middleware] Missing Supabase env vars. SUPABASE_URL=${supabaseUrl}, SUPABASE_ANON_KEY=${supabaseKey ? '[set]' : '[missing]'}`
+    `[auth.middleware] Missing required env vars.\n` +
+    `  SUPABASE_URL: ${supabaseUrl ? 'OK' : 'MISSING'}\n` +
+    `  SUPABASE_ANON_KEY: ${supabaseKey ? 'OK' : 'MISSING'}`
   );
 }
 
