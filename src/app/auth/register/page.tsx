@@ -113,10 +113,11 @@ function RegisterForm() {
         }),
       });
       
-      if (role === "RECRUITER") {
-        router.push("/dashboard/recruiter");
+      const state = useAppStore.getState();
+      if (!state.hasProfile) {
+        router.push("/auth/onboarding");
       } else {
-        router.push("/dashboard/employee");
+        router.push(`/dashboard/${role.toLowerCase()}`);
       }
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.");

@@ -26,7 +26,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     // DEV BYPASS for Supabase rate limit testing
     if (process.env.NODE_ENV === 'development' && token.startsWith('dev-bypass-token|')) {
       const email = token.split('|')[1];
-      req.user = { id: `dev-bypass-${Date.now()}`, email };
+      const stableId = `dev-bypass-${Buffer.from(email).toString('hex')}`;
+      req.user = { id: stableId, email };
       return next();
     }
 
@@ -53,7 +54,7 @@ export const authorize = (...roles: string[]) => {
         return res.status(401).json({ message: 'Unauthorized' });
       }
 
-      if (req.user.id?.startsWith('dev-bypass-') || process.env.NODE_ENV === 'development') {
+      if (req.user.id?.startsWith('dev-bypass-')) {
         req.user.dbId = req.user.dbId || req.user.id || 'dev-db-id';
         req.user.role = req.user.role || roles[0] || 'EMPLOYEE';
         return next();
@@ -66,11 +67,19 @@ export const authorize = (...roles: string[]) => {
         });
       } catch (dbErr) {
         console.warn("DB connection error in authorize middleware, using dev fallback:", dbErr);
+        if (process.env.NODE_ENV === 'development') {
+          req.user.dbId = req.user.dbId || req.user.id || 'dev-db-id';
+          req.user.role = req.user.role || roles[0] || 'EMPLOYEE';
+          return next();
+        }
+      }
+      
+      if (!dbUser && process.env.NODE_ENV === 'development') {
         req.user.dbId = req.user.dbId || req.user.id || 'dev-db-id';
         req.user.role = req.user.role || roles[0] || 'EMPLOYEE';
         return next();
       }
-      
+
       if (!dbUser || !roles.includes(dbUser.role)) {
         return res.status(403).json({ message: 'Forbidden - Insufficient permissions' });
       }

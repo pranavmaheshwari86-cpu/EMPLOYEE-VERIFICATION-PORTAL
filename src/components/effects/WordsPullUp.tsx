@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useRef } from "react";
-import { motion, useInView, Variants } from "framer-motion";
+import React from "react";
+import { WordsPullUpMultiStyle } from "./WordsPullUpMultiStyle";
 
 interface WordsPullUpProps {
   text: string;
@@ -10,59 +10,22 @@ interface WordsPullUpProps {
 }
 
 export function WordsPullUp({ text, className = "", showAsterisk = false }: WordsPullUpProps) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  if (!showAsterisk) {
+    return <WordsPullUpMultiStyle segments={[{ text }]} className={className} />;
+  }
 
   const words = text.split(" ");
-
-  const container: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
-  };
-
-  const wordItem: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    show: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 15,
-        stiffness: 100,
-      },
-    },
-  };
+  const mainText = words.slice(0, -1).join(" ");
+  const lastWord = words[words.length - 1];
 
   return (
-    <motion.div
-      ref={ref}
-      variants={container}
-      initial="hidden"
-      animate={isInView ? "show" : "hidden"}
-      className={`inline-flex flex-wrap ${className}`}
-    >
-      {words.map((word, i) => {
-        const isLastWord = i === words.length - 1;
-        return (
-          <motion.span
-            key={i}
-            variants={wordItem}
-            className="mr-[0.2em] relative"
-          >
-            {word}
-            {showAsterisk && isLastWord && (
-              <span className="absolute top-[0.65em] -right-[0.3em] text-[0.31em]">
-                *
-              </span>
-            )}
-          </motion.span>
-        );
-      })}
-    </motion.div>
+    <WordsPullUpMultiStyle
+      className={className}
+      segments={[
+        ...(mainText ? [{ text: `${mainText} ` }] : []),
+        { text: lastWord, className: "relative pr-2 after:content-['*'] after:absolute after:top-1 after:right-0 after:text-[0.4em]" }
+      ]}
+    />
   );
 }
+

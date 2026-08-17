@@ -28,19 +28,11 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
         },
       });
     } catch (dbErr) {
-      console.warn('DB error in recruiter getProfile, returning default profile:', dbErr);
+      console.warn('DB error in recruiter getProfile:', dbErr);
     }
 
     if (!recruiter) {
-      res.status(200).json({
-        id: req.user.dbId || 'dev-rec-id',
-        userId: req.user.dbId || 'dev-user-id',
-        companyName: 'Aetheris Tech Corp',
-        website: 'https://aetheris.dev',
-        hrName: 'Recruiter Admin',
-        industryType: 'Technology',
-        location: 'Remote'
-      });
+      res.status(404).json({ error: 'Recruiter profile not found', profileExists: false });
       return;
     }
 
@@ -48,6 +40,47 @@ export const getProfile = async (req: Request, res: Response): Promise<void> => 
   } catch (error) {
     console.error('getProfile error:', error);
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+};
+
+export const createProfile = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) { res.status(401).json({ error: 'Not authenticated' }); return; }
+
+    const existing = await prisma.recruiter.findUnique({ where: { userId: req.user.dbId } }).catch(() => null);
+    if (existing) {
+      res.status(400).json({ error: 'Recruiter profile already exists', profileExists: true, profile: existing });
+      return;
+    }
+
+    const { firstName, lastName, companyName, website, industry } = req.body;
+
+    let company = companyName ? await prisma.company.findFirst({ where: { name: companyName } }).catch(() => null) : null;
+    if (!company) {
+      company = await prisma.company.create({
+        data: {
+          name: companyName || 'Independent',
+          website: website || '',
+          industry: industry || 'Technology',
+          slug: (companyName || 'Independent').toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now()
+        }
+      });
+    }
+
+    const newRecruiter = await prisma.recruiter.create({
+      data: {
+        userId: req.user.dbId,
+        firstName: firstName || 'New',
+        lastName: lastName || 'Recruiter',
+        companyId: company.id,
+      },
+      include: { company: true }
+    });
+
+    res.status(201).json(newRecruiter);
+  } catch (error) {
+    console.error('createProfile error:', error);
+    res.status(500).json({ error: 'Failed to create recruiter profile' });
   }
 };
 

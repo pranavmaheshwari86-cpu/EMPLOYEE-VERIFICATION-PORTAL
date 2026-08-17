@@ -42,7 +42,7 @@ export default function JobsPage() {
     skills: ""
   });
 
-  const [savedJobs, setSavedJobs] = useState<number[]>([]);
+  const [savedJobs, setSavedJobs] = useState<(string | number)[]>([]);
   const [errorStates, setErrorStates] = useState<Record<string, string>>({});
 
   const handleApplyClick = (job: any) => {
@@ -88,7 +88,7 @@ export default function JobsPage() {
 
     applyForJob(String(job.id));
   };
-  const toggleSave = (id: number) => {
+  const toggleSave = (id: string | number) => {
     setSavedJobs(prev => prev.includes(id) ? prev.filter(jId => jId !== id) : [...prev, id]);
   };
 
@@ -163,7 +163,7 @@ export default function JobsPage() {
     // --- AUTOMATIC PROFILE MATCHING (Only applied on "matches" tab) ---
     if (activeTab === "matches" && user && user.role === 'EMPLOYEE') {
       // 1. Experience matching
-      if (user.experience !== undefined && user.experience !== null && user.experience !== "") {
+      if (user.experience !== undefined && user.experience !== null && String(user.experience) !== "") {
         result = result.filter(j => j.minExperience <= Number(user.experience));
       }
 

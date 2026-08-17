@@ -16,7 +16,7 @@ export function CursorGlow({
   size = 400,
   opacity = 0.07,
 }: CursorGlowProps) {
-  const [position, setPosition] = useState({ x: -1000, y: -1000 });
+  const divRef = React.useRef<HTMLDivElement>(null);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -50,27 +50,29 @@ export function CursorGlow({
     };
 
     const updatePosition = () => {
-      // Lerp (linear interpolation) for smooth following
-      currentX += (targetX - currentX) * 0.1;
-      currentY += (targetY - currentY) * 0.1;
+      currentX += (targetX - currentX) * 0.15;
+      currentY += (targetY - currentY) * 0.15;
 
-      setPosition({ x: currentX, y: currentY });
+      if (divRef.current) {
+        divRef.current.style.transform = `translate3d(${currentX - size / 2}px, ${currentY - size / 2}px, 0)`;
+      }
       animationFrameId = requestAnimationFrame(updatePosition);
     };
 
-    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
     animationFrameId = requestAnimationFrame(updatePosition);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [isDesktop]);
+  }, [isDesktop, size]);
 
   if (!isDesktop) return null;
 
   return (
     <div
+      ref={divRef}
       className={cn(
         "fixed pointer-events-none z-[1] will-change-transform rounded-full",
         className
@@ -80,7 +82,7 @@ export function CursorGlow({
         height: size,
         left: 0,
         top: 0,
-        transform: `translate(${position.x - size / 2}px, ${position.y - size / 2}px)`,
+        transform: `translate3d(-1000px, -1000px, 0)`,
         background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
         opacity,
       }}

@@ -1,0 +1,637 @@
+[
+  {
+    "id": "TC001",
+    "title": "Register and access an authorized account",
+    "description": "This verifies that a new employee or recruiter can register, sign in, and reach an authorized profile view.",
+    "category": "Authentication & Authorization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the registration details for a new employee account"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user reaches an authorized profile or dashboard view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated user profile is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "View the current profile and credentials",
+    "description": "This verifies that a signed-in employee can open their profile and see their verified personal details, experiences, skills, and certifications.",
+    "category": "Employee Profile & Credentials",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the profile view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the profile details are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify verified credentials are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Create a verification request",
+    "description": "A recruiter or reviewer can create a verification request for a candidate and see it recorded as pending.",
+    "category": "Verification Workflows",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "action",
+        "description": "Click the verification workflows link"
+      },
+      {
+        "type": "action",
+        "description": "Start a new verification request"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required verification details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the verification request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a pending verification record is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Update profile credentials and keep changes after reload",
+    "description": "This verifies that an employee can edit profile credentials, save them, and see the updated information persist after reloading the profile view.",
+    "category": "Employee Profile & Credentials",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the profile view"
+      },
+      {
+        "type": "action",
+        "description": "Update one profile credential field with a new valid value"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "action",
+        "description": "Reload the profile view"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated credential is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the saved profile changes persist"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Review verification status and outcome",
+    "description": "A user with verification access can open an existing verification record, review proof details, and see the updated outcome after an edit.",
+    "category": "Verification Workflows",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "action",
+        "description": "Click the verification workflows link"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing verification record"
+      },
+      {
+        "type": "action",
+        "description": "Update the verification outcome"
+      },
+      {
+        "type": "action",
+        "description": "Save the review changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify updated cryptographic proof status details are visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Apply to a job",
+    "description": "An authenticated candidate can submit a job application and see a confirmation outcome.",
+    "category": "Job Discovery & Application",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to browse jobs"
+      },
+      {
+        "type": "action",
+        "description": "Select a job to apply for"
+      },
+      {
+        "type": "action",
+        "description": "Submit the application"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an application confirmation is visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Create a recruiter job posting",
+    "description": "A logged-in recruiter can create a new job posting and see it added to managed postings.",
+    "category": "Recruiter Job Posting",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "action",
+        "description": "Click the recruiter job posting link"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new job posting"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the required job details"
+      },
+      {
+        "type": "action",
+        "description": "Submit the job posting"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the created posting is visible in managed postings"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Browse verified jobs",
+    "description": "A candidate can open the job board and view verified job listings.",
+    "category": "Job Discovery & Application",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to browse jobs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify verified job listings are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Edit a recruiter job posting",
+    "description": "A recruiter can update an existing posting and see the revised details persist.",
+    "category": "Recruiter Job Posting",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the form"
+      },
+      {
+        "type": "action",
+        "description": "Click the recruiter job posting link"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing managed posting"
+      },
+      {
+        "type": "action",
+        "description": "Edit the posting details"
+      },
+      {
+        "type": "action",
+        "description": "Save the changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated posting details are visible"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Search and filter jobs",
+    "description": "A candidate can narrow the job board to relevant verified roles using search and filters.",
+    "category": "Job Discovery & Application",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to browse jobs"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a search term for engineer roles"
+      },
+      {
+        "type": "action",
+        "description": "Select the verified jobs filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify matched verified jobs are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "View the public landing page content",
+    "description": "This verifies that an anonymous visitor can open the marketing homepage and see the product messaging and feature highlights.",
+    "category": "Landing Page & Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the hero content is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify feature highlights are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC012",
+    "title": "Toggle the site theme from the landing page",
+    "description": "This verifies that an anonymous visitor can change the theme on the public homepage and the page updates its client-side styling state.",
+    "category": "Landing Page & Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the theme toggle"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the page styling reflects the selected theme"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC013",
+    "title": "Handle an unknown public route",
+    "description": "This verifies that an anonymous visitor who opens an unsupported route sees a routed fallback or not-found state instead of a broken page.",
+    "category": "Landing Page & Navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click a navigation path that leads to an unsupported page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a not-found or fallback state is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC014",
+    "title": "Show validation errors for malformed profile updates",
+    "description": "This verifies that an employee who submits an invalid profile payload sees validation feedback and the profile is not updated.",
+    "category": "Employee Profile & Credentials",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to the profile view"
+      },
+      {
+        "type": "action",
+        "description": "Enter an invalid value into a profile field that requires validation"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a profile validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the invalid changes are not saved"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC015",
+    "title": "Reject invalid login credentials",
+    "description": "This verifies that an anonymous user entering incorrect credentials sees a login failure and remains unable to access protected account data.",
+    "category": "Authentication & Authorization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with fake values"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with fake values"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a login error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify protected account data is not displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC016",
+    "title": "Reject unauthorized recruiter posting access",
+    "description": "An unauthenticated visitor cannot create recruiter job postings without the proper role.",
+    "category": "Recruiter Job Posting",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the recruiter job posting link"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new job posting"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an access denied message is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC017",
+    "title": "Block access to profile data without signing in",
+    "description": "This verifies that an unauthenticated visitor cannot open the profile view and instead sees an access denied state.",
+    "category": "Authentication & Authorization",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /profile"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an access denied or sign-in required state is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC018",
+    "title": "Block unsupported job filters",
+    "description": "A candidate sees validation feedback when using job filters that are not supported.",
+    "category": "Job Discovery & Application",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the link to browse jobs"
+      },
+      {
+        "type": "action",
+        "description": "Enter an unsupported job filter value"
+      },
+      {
+        "type": "action",
+        "description": "Apply the filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is visible"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC019",
+    "title": "Show not found for unknown verification record",
+    "description": "A user sees a not found state when opening a verification record that does not exist.",
+    "category": "Verification Workflows",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the verification workflows link"
+      },
+      {
+        "type": "action",
+        "description": "Open an unknown verification record"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a not found message is visible"
+      }
+    ],
+    "priority": "Low"
+  }
+]

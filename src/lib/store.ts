@@ -17,6 +17,7 @@ export interface User {
   firstName: string;
   lastName: string;
   role: UserRole;
+  hasProfile?: boolean;
   avatar?: string;
   companyName?: string;
   officialEmail?: string;
@@ -66,9 +67,11 @@ interface AppState {
   // Auth State
   user: User | null;
   isAuthenticated: boolean;
+  hasProfile: boolean;
   isLoading: boolean;
   login: (email: string, password: string, role?: UserRole, firstName?: string, lastName?: string) => Promise<void>;
   register: (data: Partial<User> & { password?: string }) => Promise<void>;
+  createProfile: (data: Partial<User>) => Promise<void>;
   updateUser: (updates: Partial<User>) => Promise<void>;
   fetchProfile: () => Promise<void>;
   logout: () => void;
@@ -99,6 +102,7 @@ export const useAppStore = create<AppState>()(
       // Auth State
       user: null,
       isAuthenticated: false,
+      hasProfile: false,
       isLoading: false,
 
       login: async (email, password, role, firstName, lastName) => {
@@ -150,22 +154,17 @@ export const useAppStore = create<AppState>()(
             localStorage.setItem('token', authData.session.access_token);
           }
           
-          // Merge auth data with existing persisted user data to preserve profile fields
-          const existingUser = get().user;
-          const isSameUser = existingUser?.email === authData.user!.email;
-          
           set({
             user: {
-              // If same user is logging back in, preserve their saved profile data
-              ...(isSameUser ? existingUser : {}),
-              // Auth fields always take priority
               id: authData.user!.id,
               email: authData.user!.email!,
-              firstName: authData.user!.user_metadata?.firstName || (isSameUser ? existingUser?.firstName : undefined) || 'User',
-              lastName: authData.user!.user_metadata?.lastName || (isSameUser ? existingUser?.lastName : undefined) || '',
-              role: authData.user!.user_metadata?.role || role || (isSameUser ? existingUser?.role : undefined) || 'EMPLOYEE',
+              firstName: authData.user!.user_metadata?.firstName || firstName || 'User',
+              lastName: authData.user!.user_metadata?.lastName || lastName || '',
+              role: authData.user!.user_metadata?.role || role || 'EMPLOYEE',
+              hasProfile: false,
             },
             isAuthenticated: true,
+            hasProfile: false,
             isLoading: false,
           });
 
@@ -248,6 +247,7 @@ export const useAppStore = create<AppState>()(
               firstName: data.firstName || 'New',
               lastName: data.lastName || 'User',
               role: data.role || 'EMPLOYEE',
+              hasProfile: false,
               companyName: data.companyName,
               officialEmail: data.officialEmail,
               website: data.website,
@@ -256,10 +256,11 @@ export const useAppStore = create<AppState>()(
               location: data.location,
             },
             isAuthenticated: true,
+            hasProfile: false,
             isLoading: false,
           });
 
-          // Sync the user to the backend
+          // Sync the user to the backend (User identity record)
           await fetchAPI('/auth/sync', {
             method: 'POST',
             body: JSON.stringify({
@@ -295,38 +296,115 @@ export const useAppStore = create<AppState>()(
           const endpoint = user.role === 'EMPLOYEE' ? '/employee/profile' : '/recruiter/profile';
           const profile = await fetchAPI(endpoint);
           
+          if (!profile || profile.error || profile.profileExists === false) {
+            set((state) => ({
+              hasProfile: false,
+              user: state.user ? {
+                ...state.user,
+                hasProfile: false,
+                introduction: '',
+                experience: 0,
+                techStack: [],
+                languages: [],
+                isFresher: true,
+                workExperience: [],
+                verifications: [],
+              } : null
+            }));
+            return;
+          }
+
           if (user.role === 'EMPLOYEE') {
             set({
+              hasProfile: true,
               user: {
                 ...user,
-                // Only overwrite local data if backend returned a non-empty value
-                introduction: profile.bio ?? user.introduction,
-                experience: profile.yearsOfExperience ?? user.experience,
-                techStack: (profile.techStack && profile.techStack.length > 0) ? profile.techStack : user.techStack,
-                languages: (profile.languages && profile.languages.length > 0) ? profile.languages : user.languages,
-                isFresher: profile.isFresher ?? user.isFresher,
-                workExperience: (profile.workExperiences && profile.workExperiences.length > 0) ? profile.workExperiences : user.workExperience,
-                linkedin: profile.socialLinks?.[0] || user.linkedin,
-                github: profile.socialLinks?.[1] || user.github,
-                portfolio: profile.portfolioLinks?.[0] || user.portfolio,
-                verifications: (profile.verifications && profile.verifications.length > 0) ? profile.verifications : user.verifications,
+                hasProfile: true,
+                firstName: profile.firstName || user.firstName,
+                lastName: profile.lastName || user.lastName,
+                introduction: profile.bio || '',
+                experience: profile.yearsOfExperience || 0,
+                techStack: profile.techStack || [],
+                languages: profile.languages || [],
+                isFresher: profile.isFresher ?? true,
+                workExperience: profile.workExperiences || [],
+                linkedin: profile.socialLinks?.[0] || '',
+                github: profile.socialLinks?.[1] || '',
+                portfolio: profile.portfolioLinks?.[0] || '',
+                verifications: profile.verifications || [],
               }
             });
           } else {
             set({
+              hasProfile: true,
               user: {
                 ...user,
-                companyName: profile.companyName || user.companyName,
-                website: profile.website || user.website,
-                industryType: profile.industry || user.industryType,
-                companyDescription: profile.companyDescription || user.companyDescription,
-                contactDetails: profile.contactDetails || user.contactDetails,
-                socialLinks: profile.socialLinks || user.socialLinks,
+                hasProfile: true,
+                companyName: profile.company?.name || profile.companyName || '',
+                website: profile.company?.website || profile.website || '',
+                industryType: profile.company?.industry || profile.industry || '',
+                companyDescription: profile.companyDescription || '',
+                contactDetails: profile.contactDetails || null,
+                socialLinks: profile.socialLinks || [],
               }
             });
           }
         } catch (error) {
-          console.warn("Could not fetch remote profile, maintaining local user state:", error);
+          console.warn("No profile found or backend error:", error);
+          set((state) => ({
+            hasProfile: false,
+            user: state.user ? {
+              ...state.user,
+              hasProfile: false,
+              introduction: '',
+              experience: 0,
+              techStack: [],
+              languages: [],
+              isFresher: true,
+              workExperience: [],
+              verifications: [],
+            } : null
+          }));
+        }
+      },
+
+      createProfile: async (profileData) => {
+        const { user } = get();
+        if (!user) throw new Error("Not authenticated");
+        set({ isLoading: true });
+        try {
+          const endpoint = user.role === 'EMPLOYEE' ? '/employee/profile' : '/recruiter/profile';
+          const created = await fetchAPI(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(profileData)
+          });
+          
+          set({
+            hasProfile: true,
+            isLoading: false,
+            user: {
+              ...user,
+              ...profileData,
+              hasProfile: true,
+              id: created.id || user.id,
+              introduction: created.bio || profileData.introduction || '',
+              experience: created.yearsOfExperience ?? profileData.experience ?? 0,
+              techStack: created.techStack || profileData.techStack || [],
+              languages: created.languages || profileData.languages || ['English'],
+              isFresher: created.isFresher ?? profileData.isFresher ?? true,
+              workExperience: created.workExperiences || profileData.workExperience || [],
+              verifications: created.verifications || [],
+            }
+          });
+
+          get().addNotification({
+            title: 'Profile Created',
+            message: 'Your profile has been created successfully.',
+          });
+        } catch (err: any) {
+          set({ isLoading: false });
+          console.error("createProfile error:", err);
+          throw err;
         }
       },
 
@@ -334,22 +412,18 @@ export const useAppStore = create<AppState>()(
         const { user } = get();
         if (!user) return;
         
-        // Save to local state FIRST (offline-first approach)
-        // This ensures data persists in localStorage even if the backend is down
         set((state) => ({
           user: state.user ? { ...state.user, ...updates } : null
         }));
 
-        // Then attempt to sync to backend (non-blocking)
         try {
           const endpoint = user.role === 'EMPLOYEE' ? '/employee/profile' : '/recruiter/profile';
           
-          // Map frontend fields to backend
           const payload: any = {};
           if (user.role === 'EMPLOYEE') {
             if (updates.introduction !== undefined) payload.bio = updates.introduction;
             if (updates.experience !== undefined) {
-              const parsedExp = parseInt(updates.experience, 10);
+              const parsedExp = parseInt(String(updates.experience), 10);
               if (!isNaN(parsedExp)) {
                 payload.yearsOfExperience = parsedExp;
               }
@@ -359,7 +433,6 @@ export const useAppStore = create<AppState>()(
             if (updates.isFresher !== undefined) payload.isFresher = updates.isFresher;
             if (updates.workExperience !== undefined) payload.workExperiences = updates.workExperience;
             
-            // Reconstruct socialLinks array
             if (updates.linkedin !== undefined || updates.github !== undefined) {
               payload.socialLinks = [
                 updates.linkedin ?? user.linkedin ?? '',
@@ -385,19 +458,26 @@ export const useAppStore = create<AppState>()(
             });
           }
         } catch (error) {
-          // Data is already saved locally — just log the backend sync failure
           console.warn("Backend sync failed (data saved locally):", error);
         }
       },
 
       logout: async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
+        try {
+          const supabase = createClient();
+          await supabase.auth.signOut();
+        } catch (e) {
+          console.warn("SignOut error:", e);
+        }
         localStorage.removeItem('token');
+        localStorage.removeItem('aetheris-storage');
         set({
           user: null,
           isAuthenticated: false,
+          hasProfile: false,
           notifications: [],
+          jobs: [],
+          appliedJobs: [],
         });
       },
 
@@ -480,6 +560,7 @@ export const useAppStore = create<AppState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        hasProfile: state.hasProfile,
         sidebarExpanded: state.sidebarExpanded,
         jobs: state.jobs,
         appliedJobs: state.appliedJobs,

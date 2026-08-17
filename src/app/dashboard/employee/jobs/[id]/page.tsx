@@ -206,30 +206,37 @@ export default function JobDetailsPage() {
 
           <Section title="Official Links" icon={ExternalLink}>
             <ul className="space-y-3">
-              {job.officialLinks?.website && (
-                <li>
-                  <a href={job.officialLinks.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-white transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
-                    <Globe className="w-4 h-4" /> Company Website
-                  </a>
-                </li>
-              )}
-              {job.officialLinks?.linkedin && (
-                <li>
-                  <a href={job.officialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-[#0a66c2] transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
-                    <Users className="w-4 h-4" /> LinkedIn Profile
-                  </a>
-                </li>
-              )}
-              {job.officialLinks?.twitter && (
-                <li>
-                  <a href={job.officialLinks.twitter} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-[#1da1f2] transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
-                    <MessageCircle className="w-4 h-4" /> Twitter / X
-                  </a>
-                </li>
-              )}
-              {!job.officialLinks?.website && !job.officialLinks?.linkedin && !job.officialLinks?.twitter && (
-                <p className="text-gray-500 text-sm">No official links provided.</p>
-              )}
+              {(() => {
+                const links = job.officialLinks as { website?: string; linkedin?: string; twitter?: string } | undefined;
+                if (!links?.website && !links?.linkedin && !links?.twitter) {
+                  return <p className="text-gray-500 text-sm">No official links provided.</p>;
+                }
+                return (
+                  <>
+                    {links.website && (
+                      <li>
+                        <a href={links.website} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-white transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                          <Globe className="w-4 h-4" /> Company Website
+                        </a>
+                      </li>
+                    )}
+                    {links.linkedin && (
+                      <li>
+                        <a href={links.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-[#0a66c2] transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                          <Users className="w-4 h-4" /> LinkedIn Profile
+                        </a>
+                      </li>
+                    )}
+                    {links.twitter && (
+                      <li>
+                        <a href={links.twitter} target="_blank" rel="noreferrer" className="flex items-center gap-3 text-gray-400 text-sm hover:text-[#1da1f2] transition-colors p-3 rounded-lg bg-white/5 hover:bg-white/10">
+                          <MessageCircle className="w-4 h-4" /> Twitter / X
+                        </a>
+                      </li>
+                    )}
+                  </>
+                );
+              })()}
             </ul>
           </Section>
         </div>

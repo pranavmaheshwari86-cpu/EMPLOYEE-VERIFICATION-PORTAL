@@ -35,36 +35,34 @@ export function AIWidget() {
     e?.preventDefault();
     if (!inputValue.trim()) return;
 
+    const currentInput = inputValue;
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: inputValue
+      content: currentInput
     };
 
-    setMessages(prev => [...prev, userMessage]);
     setInputValue("");
-    setIsTyping(true);
 
-    // Mock AI response
-    setTimeout(() => {
-      let responseText = "I can help with that! However, my core systems are currently in demo mode. Try logging in as an Employer to post a job or as a Candidate to build your profile.";
-      
-      const lowerInput = userMessage.content.toLowerCase();
-      if (lowerInput.includes("job") || lowerInput.includes("hiring")) {
-        responseText = "To find or post jobs, please navigate to our Jobs portal or log in to your dashboard. We use advanced AI matching to connect the right people.";
-      } else if (lowerInput.includes("verify") || lowerInput.includes("trust")) {
-        responseText = "AETHERIS uses a multi-layered verification system checking Identity, Education, and Employment history cryptographically to ensure a 99.9% trust rating.";
-      } else if (lowerInput.includes("pricing") || lowerInput.includes("cost")) {
-        responseText = "Our employer plans start at $299/mo for Startups. Candidates can use the platform entirely for free! You can see full details in the Employer dashboard.";
-      }
+    let responseText = "I can help with that! However, my core systems are currently in demo mode. Try logging in as an Employer to post a job or as a Candidate to build your profile.";
+    const lowerInput = currentInput.toLowerCase();
+    if (lowerInput.includes("job") || lowerInput.includes("hiring")) {
+      responseText = "To find or post jobs, please navigate to our Jobs portal or log in to your dashboard. We use advanced AI matching to connect the right people.";
+    } else if (lowerInput.includes("verify") || lowerInput.includes("trust")) {
+      responseText = "AETHERIS uses a multi-layered verification system checking Identity, Education, and Employment history cryptographically to ensure a 99.9% trust rating.";
+    } else if (lowerInput.includes("pricing") || lowerInput.includes("cost")) {
+      responseText = "Our employer plans start at $299/mo for Startups. Candidates can use the platform entirely for free! You can see full details in the Employer dashboard.";
+    }
 
-      setMessages(prev => [...prev, {
+    setMessages(prev => [
+      ...prev,
+      userMessage,
+      {
         id: (Date.now() + 1).toString(),
         role: "bot",
         content: responseText
-      }]);
-      setIsTyping(false);
-    }, 1500);
+      }
+    ]);
   };
 
   return (

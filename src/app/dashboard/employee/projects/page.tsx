@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Video, Play, Code2, Globe, Code, X } from "lucide-react";
+import { Plus, Code2, Globe, Code, X } from "lucide-react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { GlassInput } from "@/components/ui/glass-input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,7 +13,6 @@ interface Project {
   name: string;
   description: string;
   techStack: string[];
-  videoUrl: string | null;
   demoUrl?: string;
   repoUrl?: string;
 }
@@ -30,7 +29,7 @@ export default function ProjectsPage() {
 
   const [projects, setProjects] = useState<Project[]>(DEFAULT_PROJECTS);
   const [isAdding, setIsAdding] = useState(false);
-  const [newProject, setNewProject] = useState({ name: "", description: "", techStack: "", videoUrl: "", demoUrl: "", repoUrl: "" });
+  const [newProject, setNewProject] = useState({ name: "", description: "", techStack: "", demoUrl: "", repoUrl: "" });
 
   const handleAddProject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,13 +40,12 @@ export default function ProjectsPage() {
       name: newProject.name,
       description: newProject.description,
       techStack: newProject.techStack.split(",").map(s => s.trim()).filter(Boolean),
-      videoUrl: newProject.videoUrl || null,
       demoUrl: newProject.demoUrl || undefined,
       repoUrl: newProject.repoUrl || undefined
     };
 
     setProjects([project, ...projects]);
-    setNewProject({ name: "", description: "", techStack: "", videoUrl: "", demoUrl: "", repoUrl: "" });
+    setNewProject({ name: "", description: "", techStack: "", demoUrl: "", repoUrl: "" });
     setIsAdding(false);
   };
 
@@ -99,15 +97,6 @@ export default function ProjectsPage() {
                       value={newProject.techStack}
                       onChange={(e) => setNewProject({...newProject, techStack: e.target.value})}
                       placeholder="e.g. React, Node.js, GraphQL" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-aetheris-muted mb-1.5">Demo Video URL (optional)</label>
-                    <GlassInput 
-                      label="Demo Video URL"
-                      value={newProject.videoUrl}
-                      onChange={(e) => setNewProject({...newProject, videoUrl: e.target.value})}
-                      placeholder="https://..." 
                     />
                   </div>
                   <div>
@@ -173,44 +162,6 @@ export default function ProjectsPage() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Video Placeholder / Player */}
-            <div className="mt-auto mb-6 relative w-full aspect-video rounded-xl overflow-hidden bg-black/40 border border-white/5 flex flex-col items-center justify-center group">
-              {project.videoUrl ? (
-                <>
-                  <video 
-                    src={project.videoUrl} 
-                    className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
-                    muted
-                    loop
-                    onMouseOver={(e) => {
-                      const v = e.target as HTMLVideoElement;
-                      const playPromise = v.play();
-                      if (playPromise !== undefined) {
-                        playPromise.catch(() => {
-                          // Ignore AbortError when play is interrupted by pause
-                        });
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      const v = e.target as HTMLVideoElement;
-                      v.pause();
-                      v.currentTime = 0;
-                    }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:scale-110 transition-transform">
-                    <div className="w-12 h-12 rounded-full bg-aetheris-cyan/20 backdrop-blur-sm border border-aetheris-cyan/40 flex items-center justify-center">
-                      <Play className="w-5 h-5 text-aetheris-cyan ml-1" />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Video className="w-10 h-10 text-white/10 mb-2" />
-                  <span className="text-xs text-aetheris-muted">No demo video uploaded</span>
-                </>
-              )}
             </div>
 
             <div className="flex items-center gap-6 pt-4 border-t border-white/5">

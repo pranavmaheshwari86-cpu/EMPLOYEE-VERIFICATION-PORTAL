@@ -118,14 +118,17 @@ export function ParticleField({
       canvas.addEventListener("mouseleave", handleMouseLeave);
     }
 
+    const connDistSq = connectionDistance * connectionDistance;
+
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
 
       const particles = particlesRef.current;
       const mouse = mouseRef.current;
+      const len = particles.length;
 
-      // Update positions
-      for (let i = 0; i < particles.length; i++) {
+      // Update positions & draw
+      for (let i = 0; i < len; i++) {
         const p = particles[i];
 
         // Move
@@ -134,17 +137,18 @@ export function ParticleField({
 
         // Wrap around (toroidal)
         if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
+        else if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
+        else if (p.y > height) p.y = 0;
 
         // Mouse repulsion
         if (interactive) {
           const dx = p.x - mouse.x;
           const dy = p.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const distSq = dx * dx + dy * dy;
           
-          if (dist < 150) {
+          if (distSq < 22500 && distSq > 0) { // 150^2 = 22500
+            const dist = Math.sqrt(distSq);
             const force = (150 - dist) / 150;
             p.x += (dx / dist) * force * 2;
             p.y += (dy / dist) * force * 2;
@@ -158,21 +162,23 @@ export function ParticleField({
         ctx.fill();
 
         // Draw connections
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p.x - p2.x;
-          const dy = p.y - p2.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        if (connectionDistance > 0) {
+          for (let j = i + 1; j < len; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const distSq = dx * dx + dy * dy;
 
-          if (dist < connectionDistance) {
-            const opacity = (1 - dist / connectionDistance) * 0.2; // Max line opacity 0.2
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            // Mix colors for line
-            ctx.strokeStyle = `rgba(${p.baseColor}, ${opacity})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+            if (distSq < connDistSq) {
+              const dist = Math.sqrt(distSq);
+              const opacity = (1 - dist / connectionDistance) * 0.2;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(${p.baseColor}, ${opacity})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
           }
         }
       }

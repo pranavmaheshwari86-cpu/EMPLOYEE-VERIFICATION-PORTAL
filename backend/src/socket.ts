@@ -13,14 +13,28 @@ export const setupWebSocket = (httpServer: HttpServer) => {
     },
   });
 
-  // Basic Redis setup for pub/sub if Redis URL is provided
+  // Redis setup for pub/sub if Redis URL is provided
   if (process.env.REDIS_URL) {
-    const pubClient = new Redis(process.env.REDIS_URL);
-    const subClient = pubClient.duplicate();
-    io.adapter(createAdapter(pubClient, subClient));
-    console.log('Redis adapter connected to Socket.io');
+    try {
+      const pubClient = new Redis(process.env.REDIS_URL, { lazyConnect: true });
+      const subClient = pubClient.duplicate();
+      
+      pubClient.on('error', (err) => console.error('Socket.io Redis Pub Error:', err.message));
+      subClient.on('error', (err) => console.error('Socket.io Redis Sub Error:', err.message));
+      
+      Promise.all([pubClient.connect(), subClient.connect()])
+        .then(() => {
+          io.adapter(createAdapter(pubClient, subClient));
+          console.log('Redis adapter connected to Socket.io');
+        })
+        .catch((err) => {
+          console.warn('Socket.io Redis connection deferred:', err.message);
+        });
+    } catch (e) {
+      console.warn('Failed to initialize Socket.io Redis adapter:', e);
+    }
   } else {
-    console.warn('REDIS_URL not provided, Socket.io will not use Redis adapter');
+    console.warn('REDIS_URL not provided, Socket.io using single-instance fallback');
   }
 
   io.on('connection', (socket) => {
@@ -28,15 +42,16 @@ export const setupWebSocket = (httpServer: HttpServer) => {
 
     // Real-time messaging
     socket.on('sendMessage', (data) => {
-      console.log('Message received:', data);
-      // Broadcast to room or user
-      // io.to(data.roomId).emit('newMessage', data);
+      if (data?.roomId) {
+        socket.to(data.roomId).emit('newMessage', data);
+      }
     });
 
     // Real-time notifications
     socket.on('subscribeNotifications', (userId) => {
-      socket.join(`notifications_${userId}`);
-      console.log(`User ${userId} subscribed to notifications`);
+      if (userId) {
+        socket.join(`notifications_${userId}`);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -46,3 +61,4 @@ export const setupWebSocket = (httpServer: HttpServer) => {
 
   return io;
 };
+

@@ -115,10 +115,10 @@ export const GlassButton = forwardRef<HTMLButtonElement, GlassButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "relative inline-flex flex-shrink-0 whitespace-nowrap items-center justify-center font-medium rounded-xl transition-all duration-150 active:scale-95",
+          "relative inline-flex flex-shrink-0 whitespace-nowrap items-center justify-center font-medium rounded-xl transition-transform transition-opacity transition-colors duration-75 ease-out active:scale-95 active:opacity-90 active:translate-y-0.5 select-none touch-manipulation cursor-pointer",
           getVariantClass(),
           getSizeClass(),
-          disabled || loading ? "opacity-50 cursor-not-allowed hover:translate-y-0" : "",
+          disabled || loading ? "opacity-50 cursor-not-allowed hover:translate-y-0 active:scale-100" : "",
           className
         )}
         disabled={disabled || loading}

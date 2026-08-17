@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SmoothScrollProvider } from "@/components/providers/smooth-scroll";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Search, Cpu } from "lucide-react";
@@ -17,6 +17,39 @@ export function LandingPage() {
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+
+  const [activeSection, setActiveSection] = useState("experience");
+
+  useEffect(() => {
+    const sections = [
+      { id: "experience", nav: "experience" },
+      { id: "visions", nav: "visions" },
+      { id: "fleet", nav: "fleet" },
+      { id: "journal", nav: "journal" }
+    ];
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 250;
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i].id);
+        if (el && el.offsetTop <= scrollPosition) {
+          setActiveSection(sections[i].nav);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navItems = [
+    { id: "experience", label: "How it Works", href: "#experience" },
+    { id: "visions", label: "Employers", href: "#visions" },
+    { id: "fleet", label: "Candidates", href: "#fleet" },
+    { id: "journal", label: "Features", href: "#journal" }
+  ];
 
   return (
     <SmoothScrollProvider>
@@ -42,8 +75,7 @@ export function LandingPage() {
         .landing-video-container {
             position: relative;
             overflow: hidden;
-            border-radius: 3rem;
-            transform: translateZ(0);
+            border-radius: 1.5rem;
         }
         .landing-video-container video {
             width: 100%;
@@ -57,14 +89,34 @@ export function LandingPage() {
         
         {/* Navigation */}
         <nav className="fixed top-0 w-full bg-[#131313]/40 text-white font-body backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 md:px-10 py-4 z-50 transition-all duration-300">
-          <div className="font-heading text-4xl tracking-tighter text-white">Aetheris</div>
-          <div className="hidden md:flex items-center gap-10">
-            <a className="text-white border-b border-white pb-1 transition-colors duration-300" href="#experience">How it Works</a>
-            <a className="text-[#c4c7c8] hover:text-white hover:backdrop-blur-2xl hover:bg-white/5 transition-all duration-300 rounded px-2 py-1" href="#visions">Employers</a>
-            <a className="text-[#c4c7c8] hover:text-white hover:backdrop-blur-2xl hover:bg-white/5 transition-all duration-300 rounded px-2 py-1" href="#fleet">Candidates</a>
-            <a className="text-[#c4c7c8] hover:text-white hover:backdrop-blur-2xl hover:bg-white/5 transition-all duration-300 rounded px-2 py-1" href="#journal">Features</a>
+          <div className="font-heading text-4xl tracking-tighter text-white cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Aetheris</div>
+          <div className="hidden md:flex items-center gap-8">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`relative py-1 px-2 text-sm transition-colors duration-300 ${
+                    isActive ? "text-white font-medium" : "text-[#c4c7c8] hover:text-white"
+                  }`}
+                >
+                  {item.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavLine"
+                      className="absolute bottom-0 left-0 right-0 h-[2px] bg-white rounded-full"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </a>
+              );
+            })}
           </div>
-          <Link href="/auth/login" className="landing-liquid-glass px-6 py-2 rounded-full font-body text-sm uppercase tracking-wider hover:bg-white/10 transition-colors">Portal</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/auth/login" className="landing-liquid-glass px-6 py-2 rounded-full font-body text-sm uppercase tracking-wider hover:bg-white/10 transition-colors">Portal</Link>
+          </div>
         </nav>
 
         {/* Section 1: Hero */}
@@ -96,11 +148,11 @@ export function LandingPage() {
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-8"
             >
-              <Link href="/auth/candidate" className="landing-liquid-glass px-8 py-4 rounded-full font-body text-white hover:bg-white/10 transition-colors uppercase tracking-widest text-sm flex items-center gap-3">
-                Candidate <ArrowRight className="w-5 h-5" />
+              <Link href="/auth/candidate" className="group relative landing-liquid-glass px-8 py-4 rounded-full font-body text-white hover:bg-white/15 hover:border-white/40 hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 transition-all duration-300 uppercase tracking-widest text-sm flex items-center gap-3 border border-white/10">
+                Candidate <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300 text-white/90 group-hover:text-white" />
               </Link>
-              <Link href="/auth/company" className="landing-liquid-glass px-8 py-4 rounded-full font-body text-white hover:bg-white/10 transition-colors uppercase tracking-widest text-sm flex items-center gap-3">
-                Company <ArrowRight className="w-5 h-5" />
+              <Link href="/auth/company" className="group relative landing-liquid-glass px-8 py-4 rounded-full font-body text-white hover:bg-white/15 hover:border-white/40 hover:shadow-[0_0_30px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 transition-all duration-300 uppercase tracking-widest text-sm flex items-center gap-3 border border-white/10">
+                Company <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300 text-white/90 group-hover:text-white" />
               </Link>
             </motion.div>
           </motion.div>

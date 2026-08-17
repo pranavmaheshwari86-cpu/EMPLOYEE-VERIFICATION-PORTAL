@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, authorize } from '../middleware/auth.middleware';
-import { getProfile, updateProfile, getSkills, getExperiences, upsertVerification } from '../controllers/employee.controller';
+import { getProfile, createProfile, updateProfile, getSkills, getExperiences, upsertVerification } from '../controllers/employee.controller';
 
 const router = Router();
 
@@ -9,6 +9,7 @@ router.use(authenticate);
 router.use(authorize('EMPLOYEE'));
 
 router.get('/profile', getProfile);
+router.post('/profile', createProfile);
 router.put('/profile', updateProfile);
 router.get('/skills', getSkills);
 router.get('/experiences', getExperiences);

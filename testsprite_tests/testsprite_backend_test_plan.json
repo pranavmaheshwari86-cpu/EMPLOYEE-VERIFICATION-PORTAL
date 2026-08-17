@@ -1,0 +1,32 @@
+[
+  {
+    "id": "TC001",
+    "title": "getlandingpagecontent",
+    "description": "Verify that GET / returns 200 with hero content, feature highlights, and navigation controls, and that the theme toggle updates client-side styling state correctly."
+  },
+  {
+    "id": "TC002",
+    "title": "postauthregisterandpostauthlogin",
+    "description": "Verify that POST /api/auth/register with valid employee or recruiter details returns 201 with created account or auth session, and POST /api/auth/login with valid credentials returns 200 with JWT or session token."
+  },
+  {
+    "id": "TC003",
+    "title": "getandpatchemployeeprofile",
+    "description": "Verify that GET /api/profile with valid employee token returns 200 with personal details, experiences, skills, and certifications, and PATCH /api/profile with updated profile data returns 200 with saved profile and reflects updates on subsequent GET."
+  },
+  {
+    "id": "TC004",
+    "title": "getjobsandpostjobapplication",
+    "description": "Verify that GET /api/jobs returns 200 with job listings, supports search and filter parameters, and POST /api/jobs/apply with valid job and candidate token returns 201 with application confirmation."
+  },
+  {
+    "id": "TC005",
+    "title": "postandputrecruiterjobpostings",
+    "description": "Verify that POST /api/recruiter/jobs with valid recruiter token and job details returns 201 with created posting, and PUT /api/recruiter/jobs/{jobId} with edits returns 200 with updated job."
+  },
+  {
+    "id": "TC006",
+    "title": "postgetandpatchverificationworkflows",
+    "description": "Verify that POST /employee/verification with valid data returns 201 with pending verification request, GET /employee/verification/{verificationId} returns 200 with verification status and cryptographic proof, and PATCH /employee/verification/{verificationId} updates verification outcome successfully."
+  }
+]

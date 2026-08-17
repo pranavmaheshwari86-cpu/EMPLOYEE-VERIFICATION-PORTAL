@@ -15,7 +15,12 @@ export function Sidebar() {
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Prefetch all sidebar navigation routes for instant transition
+    navItems.forEach((item) => {
+      router.prefetch(item.href);
+    });
+    router.prefetch("/auth/login");
+  }, [router]);
 
   const handleLogout = () => {
     logout();

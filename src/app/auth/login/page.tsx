@@ -20,6 +20,13 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
+  React.useEffect(() => {
+    router.prefetch("/auth/onboarding");
+    router.prefetch("/dashboard/employee");
+    router.prefetch("/dashboard/recruiter");
+    router.prefetch("/auth/register");
+  }, [router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
@@ -29,8 +36,13 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success("Login successful!");
-      const role = useAppStore.getState().user?.role || "EMPLOYEE";
-      router.push(`/dashboard/${role.toLowerCase()}`);
+      const state = useAppStore.getState();
+      const role = state.user?.role || "EMPLOYEE";
+      if (!state.hasProfile) {
+        router.push("/auth/onboarding");
+      } else {
+        router.push(`/dashboard/${role.toLowerCase()}`);
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to login");
     }
@@ -39,17 +51,15 @@ export default function LoginPage() {
   const handleSocialLogin = async (provider: string) => {
     toast.loading(`Connecting to ${provider}...`, { id: "auth" });
     try {
-      // DEV BYPASS for OAuth
+      // DEV BYPASS for OAuth - Instant response
       if (process.env.NODE_ENV === 'development') {
-        setTimeout(async () => {
-          try {
-            await login("dev@example.com", "Password123!", "EMPLOYEE");
-            toast.success(`Mock ${provider} login successful!`, { id: "auth" });
-            router.push("/dashboard/employee");
-          } catch (err: any) {
-            toast.error(err.message || "Failed to login", { id: "auth" });
-          }
-        }, 800);
+        try {
+          await login("dev@example.com", "Password123!", "EMPLOYEE");
+          toast.success(`Mock ${provider} login successful!`, { id: "auth" });
+          router.push("/dashboard/employee");
+        } catch (err: any) {
+          toast.error(err.message || "Failed to login", { id: "auth" });
+        }
         return;
       }
 
