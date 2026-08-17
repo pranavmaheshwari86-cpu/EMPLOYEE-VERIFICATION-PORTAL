@@ -15,9 +15,19 @@ if (typeof globalThis.WebSocket === 'undefined') {
   (globalThis as any).WebSocket = ws;
 }
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey, {
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.warn(
+    `[auth.middleware] Missing Supabase env vars. SUPABASE_URL=${supabaseUrl}, SUPABASE_ANON_KEY=${supabaseKey ? '[set]' : '[missing]'}`
+  );
+}
+
+const effectiveUrl = supabaseUrl || 'https://placeholder.supabase.co';
+const effectiveKey = supabaseKey || 'placeholder-key-for-dev';
+
+const supabase = createClient(effectiveUrl, effectiveKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,
